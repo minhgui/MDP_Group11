@@ -1,0 +1,13 @@
+train: ../train/images
+val: ../valid/images
+test: ../test/images
+
+nc: 31
+names: ['Aa', 'Bb', 'Box', 'Cc', 'Circle', 'Dd', 'Down', 'Ee', 'Eight', 'Ff', 'Five', 'Four', 'Gg', 'Hh', 'Left', 'Nine', 'One', 'Right', 'Seven', 'Six', 'Ss', 'Three', 'Tt', 'Two', 'Up', 'Uu', 'Vv', 'Ww', 'Xx', 'Yy', 'Zz']
+
+roboflow:
+  workspace: directionsalphanumeric
+  project: v2-b1rur
+  version: 5
+  license: Private
+  url: https://universe.roboflow.com/directionsalphanumeric/v2-b1rur/dataset/5
