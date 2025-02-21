@@ -342,35 +342,25 @@ public class GridMap extends View {
         showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
         int androidRowCoord = curCoord[1];
 
-        if ((androidRowCoord - 1) < 0 || androidRowCoord > 19) {
+        if ((androidRowCoord - 2) < 0 || androidRowCoord > 19) {
             showLog("row is out of bounds");
             return;
-        } else if (curCoord[0] > 20 || curCoord[0] < 2) {
+        } else if (curCoord[0] > 20 || (curCoord[0] - 2) < 0) {
             showLog("col is out of bounds");
             return;
         } else {
-            // draws the 2x2 squares in colour robotColor
-            // horizontal lines
-            for (int y = androidRowCoord - 3; y <= androidRowCoord; y++) {
-                canvas.drawLine(
-                        cells[curCoord[0] - 1][21 - y - 3].startX,
-                        cells[curCoord[0]][21 - y - 3].startY,
-                        cells[curCoord[0]][21 - y - 3].endX,
-                        cells[curCoord[0]][21 - y - 3].startY,
-                        robotColor
-                );
+            for (int y = androidRowCoord - 2; y <= androidRowCoord; y++) {
+                for (int x = curCoord[0] - 2; x <= curCoord[0]; x++) {
+                    // Draw filled squares representing the robot
+                    canvas.drawRect(
+                            cells[x][21 - y].startX,  // Top-left X
+                            cells[x][21 - y - 3].startY,  // Top-left Y
+                            cells[x][21 - y].endX,    // Bottom-right X
+                            cells[x][21 - y - 3].endY,    // Bottom-right Y
+                            robotColor                // Paint color
+                    );
+                }
             }
-            // vertical lines
-            for (int x = curCoord[0] - 3; x <= curCoord[0]; x++) {
-                canvas.drawLine(
-                        cells[x][21 - androidRowCoord - 1].endX,
-                        cells[x][21 - androidRowCoord - 1].endY,
-                        cells[x][21 - androidRowCoord - 1].endX,
-                        cells[x][21 - androidRowCoord - 3].startY,
-                        robotColor
-                );
-            }
-
 
             // use cells[initialCol][20 - initialRow] as ref
             switch (this.getRobotDirection()) {
@@ -1891,13 +1881,13 @@ public class GridMap extends View {
         showLog("Enter checking for obstacles in destination 2x2 grid");
         if (getValidPosition())
             // check obstacle for new position
-            for (int x = curCoord[0] - 2; x <= curCoord[0]; x++) {
-                for (int y = curCoord[1] - 2; y <= curCoord[1]; y++) {
+            for (int x = curCoord[0] - 1; x <= curCoord[0] + 1; x++) {
+                for (int y = curCoord[1] - 1; y <= curCoord[1] + 1; y++) {
                     for (int i = 0; i < obstacleCoord.size(); i++) {
                         showLog("x-1 = " + (x - 1) + ", y = " + y);
                         showLog("obstacleCoord.get(" + i + ")[0] = " + obstacleCoord.get(i)[0]
                                 + ", obstacleCoord.get(" + i + ")[1] = " + obstacleCoord.get(i)[1]);
-                        if (obstacleCoord.get(i)[0] == (x - 1) && obstacleCoord.get(i)[1] == y) { // HERE x
+                        if (obstacleCoord.get(i)[0] == (x - 2)  && obstacleCoord.get(i)[1] == y) { // HERE x
                             setValidPosition(false);
                             robotDirection = backupDirection;
                             break;
