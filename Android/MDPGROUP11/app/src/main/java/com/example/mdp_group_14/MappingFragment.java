@@ -203,8 +203,30 @@ public class MappingFragment extends Fragment {
                 }
                 getObsPos = GridMap.saveObstacleList();
                 editor.putString("maps",getObsPos);
-                editor.commit();
+
+                // Save Robot's position
+                int[] robotPos = gridMap.getCurCoord(); // Get current robot coordinates
+                String robotDir = gridMap.getRobotDirection(); // Get current robot direction
+
+                if (robotPos != null && robotPos.length == 2) {
+                    int robotX = robotPos[0] - 1; // Subtract 1 from X
+                    int robotY = robotPos[1] - 1; // Subtract 1 from Y
+
+                    editor.putInt("robot_x", robotX); // Save adjusted X position
+                    editor.putInt("robot_y", robotY); // Save adjusted Y position
+                }
+
+                // Save robot direction outside the if block (always saved)
+                editor.putString("robot_direction", robotDir);
+                editor.commit(); // Save all data
+
                 showToast("Saved map");
+
+                // Log message **after** saving the map
+                showLog("Saved robot at X: " + (robotPos != null ? robotPos[0] - 1 : "N/A") +
+                        ", Y: " + (robotPos != null ? robotPos[1] - 1 : "N/A") +
+                        ", Direction: " + robotDir);
+
             }
         });
 
@@ -273,6 +295,21 @@ public class MappingFragment extends Fragment {
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
+                    }
+
+                    // Load Robot’s saved position
+                    int savedX = mapPref.getInt("robot_x", -1);
+                    int savedY = mapPref.getInt("robot_y", -1);
+                    String savedDirection = mapPref.getString("robot_direction", "None");
+
+                    if (savedX != -1 && savedY != -1) {
+                        // ✅ Ensure the robot is drawn
+                        gridMap.setCurCoord(savedX + 1, savedY + 1, savedDirection); // Restore robot position
+                        GridMap.canDrawRobot = true; // ✅ Explicitly allow robot drawing
+
+
+
+                        showLog("Loaded robot at X: " + (savedX + 1) + ", Y: " + (savedY + 1) + ", Direction: " + savedDirection);
                     }
 
                     gridMap.invalidate();

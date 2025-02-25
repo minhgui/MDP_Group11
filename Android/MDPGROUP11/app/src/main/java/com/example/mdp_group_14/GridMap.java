@@ -481,6 +481,7 @@ public class GridMap extends View {
 
         if ((col - 2) >= 0 && (row - 1) >= 0) {
             Home.printMessage("ROBOT" + "," + (col - 2) * 5 + "," + (row - 1) * 5 + "," + dir.toUpperCase());
+            //showLog("ROBOT" + "," + (col - 2) * 5 + "," + (row - 1) * 5 + "," + dir.toUpperCase());
         } else {
             showLog("out of grid");
         }
