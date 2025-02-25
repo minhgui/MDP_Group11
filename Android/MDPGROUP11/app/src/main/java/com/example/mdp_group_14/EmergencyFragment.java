@@ -125,7 +125,7 @@ public class EmergencyFragment extends DialogFragment {
                 if (isObstacle)
                 {
                     gridMap.imageBearings.get(row)[col] = dir;
-                    gridMap.setObstacleCoord(col+1, row+1);
+                    gridMap.setObstacleCoord(col+1, row+1, false);
                 }
 
                 else{

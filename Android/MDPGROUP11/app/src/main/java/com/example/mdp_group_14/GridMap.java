@@ -591,7 +591,7 @@ public class GridMap extends View {
         //updateStatus((col-1)+","+(row-1)+","+direction);
     }
 
-    public void setObstacleCoord(int col, int row) {
+    public void setObstacleCoord(int col, int row, boolean isLoaded) {
         showLog("Entering setObstacleCoord");
 
 
@@ -606,8 +606,14 @@ public class GridMap extends View {
         int obstacleNumber = GridMap.obstacleCoord.size();
 
         if (((col - 1)) >= 0 && row >= 0) {
+            String message = "OBSTACLE" + "," + obstacleNumber + "," + (col - 1) * 10 + "," + (19 - row) * 10 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase();
 
-            Home.printMessage("OBSTACLE" + "," + obstacleNumber + "," + (col - 1) * 10 + "," + (19 - row) * 10 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase() + "\n");
+            if (isLoaded) {
+                message += ",Z"; // Append "Z" if the obstacle is loaded from the map
+            }
+
+            Home.printMessage(message + "\n");
+            // Home.printMessage("OBSTACLE" + "," + obstacleNumber + "," + (col - 1) * 10 + "," + (19 - row) * 10 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase() + "\n");
 //            BluetoothCommunications.getMessageReceivedTextView().append(Integer.toString((col - 1))+"\n");
 //            BluetoothCommunications.getMessageReceivedTextView().append(Integer.toString((19 - row))+"\n");
 //            BluetoothCommunications.getMessageReceivedTextView().append((imageBearings.get(19 - row)[col - 1]).toUpperCase()+"\n");
@@ -1064,7 +1070,7 @@ public class GridMap extends View {
 
 
                         // this function affects obstacle turning too
-                        this.setObstacleCoord(column, row);
+                        this.setObstacleCoord(column, row, false);
                     }
                 }
                 this.invalidate();

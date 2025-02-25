@@ -289,7 +289,7 @@ public class MappingFragment extends Fragment {
                                 direction = "";
                         }
                         gridMap.imageBearings.get(Integer.parseInt(coords[1]))[Integer.parseInt(coords[0])] = direction;
-                        gridMap.setObstacleCoord(Integer.parseInt(coords[0]) + 1, Integer.parseInt(coords[1]) + 1);
+                        gridMap.setObstacleCoord(Integer.parseInt(coords[0]) + 1, Integer.parseInt(coords[1]) + 1, true);
                         try {
                             Thread.sleep(50);
                         } catch (InterruptedException e) {
@@ -307,7 +307,13 @@ public class MappingFragment extends Fragment {
                         gridMap.setCurCoord(savedX + 1, savedY + 1, savedDirection); // Restore robot position
                         GridMap.canDrawRobot = true; // ✅ Explicitly allow robot drawing
 
+                        // ✅ Send robot data to AMDTool/RPi
+                        String dir = savedDirection.equals("up") ? "NORTH" :
+                                savedDirection.equals("down") ? "SOUTH" :
+                                        savedDirection.equals("left") ? "WEST" : "EAST";
 
+                        Home.printMessage("ROBOT," + (savedX * 5) + "," + (savedY * 5) + "," + dir.toUpperCase() + "," + "Z");
+                        showLog("ROBOT," + (savedX * 5) + "," + (savedY * 5) + "," + dir.toUpperCase() + "," + "Z");
 
                         showLog("Loaded robot at X: " + (savedX + 1) + ", Y: " + (savedY + 1) + ", Direction: " + savedDirection);
                     }
