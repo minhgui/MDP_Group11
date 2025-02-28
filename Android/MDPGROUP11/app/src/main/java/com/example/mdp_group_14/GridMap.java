@@ -480,7 +480,8 @@ public class GridMap extends View {
         dir = (direction.equals("up")) ? "NORTH" : (direction.equals("down")) ? "SOUTH" : (direction.equals("left")) ? "WEST" : "EAST";
 
         if ((col - 2) >= 0 && (row - 1) >= 0) {
-            Home.printMessage("ROBOT" + "," + (col - 2) * 5 + "," + (row - 1) * 5 + "," + dir.toUpperCase());
+            //Home.printMessage("ROBOT" + "," + (col - 2) * 5 + "," + (row - 1) * 5 + "," + dir.toUpperCase());
+            Home.printMessage("ROBOT" + "," + (col - 2) + "," + (row - 1) + "," + dir.toUpperCase());
             //showLog("ROBOT" + "," + (col - 2) * 5 + "," + (row - 1) * 5 + "," + dir.toUpperCase());
         } else {
             showLog("out of grid");
@@ -594,7 +595,6 @@ public class GridMap extends View {
     public void setObstacleCoord(int col, int row, boolean isLoaded) {
         showLog("Entering setObstacleCoord");
 
-
         int[] obstacleCoord = new int[]{col - 1, row - 1};
 
         GridMap.obstacleCoord.add(obstacleCoord);
@@ -607,13 +607,13 @@ public class GridMap extends View {
 
         if (((col - 1)) >= 0 && row >= 0) {
             String message = "OBSTACLE" + "," + obstacleNumber + "," + (col - 1) * 10 + "," + (19 - row) * 10 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase();
+            // String message = "OBSTACLE" + "," + obstacleNumber + "," + (col) * 40 + "," + (19 - row) * 40 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase();
 
             if (isLoaded) {
                 message += ",Z"; // Append "Z" if the obstacle is loaded from the map
             }
 
             Home.printMessage(message + "\n");
-            // Home.printMessage("OBSTACLE" + "," + obstacleNumber + "," + (col - 1) * 10 + "," + (19 - row) * 10 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase() + "\n");
 //            BluetoothCommunications.getMessageReceivedTextView().append(Integer.toString((col - 1))+"\n");
 //            BluetoothCommunications.getMessageReceivedTextView().append(Integer.toString((19 - row))+"\n");
 //            BluetoothCommunications.getMessageReceivedTextView().append((imageBearings.get(19 - row)[col - 1]).toUpperCase()+"\n");
@@ -621,9 +621,6 @@ public class GridMap extends View {
             showLog("out of grid");
         }
         //updateStatus(obstacleNumber + "," + (col - 1)+ "," + (19 - row) + ","  + imageBearings.get(19 - row)[col - 1]); // north east
-
-
-//        Home.printMessage({"key":"hello","value":"hello"});
     }
 
     private ArrayList<int[]> getObstacleCoord() {
@@ -816,7 +813,8 @@ public class GridMap extends View {
                     //updateStatus(obstacleid+1+ "," + (endColumn-1) + "," + (endRow-1) + ", Bearing: " + tempBearing);
 
                     if (((endColumn - 1)) >= 0 && ((endRow - 1)) >= 0) {
-                        Home.printMessage("OBSTACLE" + "," + (obstacleid + 1) + "," + (endColumn - 1) * 10 + "," + (endRow - 1) * 10 + "," + tempBearing.toUpperCase());
+                        //Home.printMessage("OBSTACLE" + "," + (obstacleid + 1) + "," + (endColumn - 1) * 10 + "," + (endRow - 1) * 10 + "," + tempBearing.toUpperCase());
+                        Home.printMessage("OBSTACLE" + "," + (obstacleid + 1) + "," + (endColumn - 1) + "," + (endRow - 1) + "," + tempBearing.toUpperCase());
                     } else {
                         showLog("out of grid");
                     }
