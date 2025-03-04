@@ -606,7 +606,7 @@ public class GridMap extends View {
         int obstacleNumber = GridMap.obstacleCoord.size();
 
         if (((col - 1)) >= 0 && row >= 0) {
-            String message = "OBSTACLE" + "," + obstacleNumber + "," + (col - 1) * 10 + "," + (19 - row) * 10 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase();
+            String message = "OBSTACLE" + "," + obstacleNumber + "," + (col - 1) + "," + (19 - row) + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase();
             // String message = "OBSTACLE" + "," + obstacleNumber + "," + (col) * 40 + "," + (19 - row) * 40 + "," + (imageBearings.get(19 - row)[col - 1]).toUpperCase();
 
             if (isLoaded) {
@@ -738,7 +738,8 @@ public class GridMap extends View {
 
             //updateStatus( obstacleNumber + "," + (initialColumn) + "," + (initialRow) + ", Bearing: " + "-1");
             if (((initialColumn - 1)) >= 0 && ((initialRow - 1)) >= 0) {
-                Home.printMessage("OBSTACLE" + "," + (obstacleid3 + 1) + "," + (initialColumn) * 10 + "," + (initialRow) * 10 + "," + "-1");
+                Home.printMessage("OBSTACLE" + "," + (obstacleid3 + 1) + "," + (initialColumn) + "," + (initialRow) + "," + "-1");
+                //Home.printMessage("OBSTACLE" + "," + (obstacleid3 + 1) + "," + (initialColumn) * 10 + "," + (initialRow) * 10 + "," + "-1");
             } else {
                 showLog("out of grid");
             }
@@ -776,7 +777,8 @@ public class GridMap extends View {
                 //updateStatus( obstacleNumber + "," + (initialColumn) + "," + (initialRow) + ", Bearing: " + "-1");
 
                 if (((initialColumn - 1)) >= 0 && ((initialRow - 1)) >= 0) {
-                    Home.printMessage("OBSTACLE" + "," + (obstacleid2 + 1) + "," + (initialColumn) * 10 + "," + (initialRow) * 10 + "," + "-1");
+                    Home.printMessage("OBSTACLE" + "," + (obstacleid2 + 1) + "," + (initialColumn) + "," + (initialRow) + "," + "-1");
+                    //Home.printMessage("OBSTACLE" + "," + (obstacleid2 + 1) + "," + (initialColumn) * 10 + "," + (initialRow) * 10 + "," + "-1");
                 } else {
                     showLog("out of grid");
                 }
@@ -962,7 +964,8 @@ public class GridMap extends View {
                             //updateStatus( (obstacleid+1) + "," + newID + ","+(tCol - 1) + "," + (tRow - 1) + ", Bearing: " + newBearing);
 
                             if (((tCol - 1)) >= 0 && ((tRow - 1)) >= 0) {
-                                Home.printMessage("OBSTACLE" + "," + (obstacleid + 1) + "," + (tCol - 1) * 10 + "," + (tRow - 1) * 10 + "," + newBearing.toUpperCase());
+                                Home.printMessage("OBSTACLE" + "," + (obstacleid + 1) + "," + (tCol - 1) + "," + (tRow - 1) + "," + newBearing.toUpperCase());
+                                //Home.printMessage("OBSTACLE" + "," + (obstacleid + 1) + "," + (tCol - 1) * 10 + "," + (tRow - 1) * 10 + "," + newBearing.toUpperCase());
                             } else {
                                 showLog("out of grid");
                             }
