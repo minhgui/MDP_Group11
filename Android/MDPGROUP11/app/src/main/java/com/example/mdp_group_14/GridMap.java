@@ -350,16 +350,23 @@ public class GridMap extends View {
             return;
         } else {
             for (int y = androidRowCoord - 2; y <= androidRowCoord; y++) {
-                for (int x = curCoord[0] - 2; x <= curCoord[0]; x++) {
-                    // Draw filled squares representing the robot
-                    canvas.drawRect(
-                            cells[x][21 - y].startX,  // Top-left X
-                            cells[x][21 - y - 3].startY,  // Top-left Y
-                            cells[x][21 - y].endX,    // Bottom-right X
-                            cells[x][21 - y - 3].endY,    // Bottom-right Y
-                            robotColor                // Paint color
-                    );
-                }
+                canvas.drawLine(
+                        cells[curCoord[0] - 2][19 - y].startX,
+                        cells[curCoord[0] - 2][19 - y].startY,
+                        cells[curCoord[0]][19 - y].endX,
+                        cells[curCoord[0] - 2][19 - y].startY,
+                        robotColor
+                );
+            }
+            // vertical lines
+            for (int x = curCoord[0] - 2; x <= curCoord[0]; x++) {
+                canvas.drawLine(
+                        cells[x][19 - androidRowCoord].startX,
+                        cells[x][19 - androidRowCoord].startY,
+                        cells[x][19 - (androidRowCoord - 2)].endX,
+                        cells[x][19 - (androidRowCoord - 2)].startY,
+                        robotColor
+                );
             }
 
             // use cells[initialCol][20 - initialRow] as ref
