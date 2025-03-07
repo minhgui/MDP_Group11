@@ -129,7 +129,7 @@ class PCClient:
                     #self.msg_queue.put(json.dumps(message))
 
                 elif message["type"] == "IMAGE_TAKEN":
-                    command = {"type": "IMAGE_TAKEN"} # remove after test
+                    #command = {"type": "IMAGE_TAKEN"} # remove after test
                     # Add image inference implementation here:
                     encoded_image = message["data"]["image"]
                     # Decode the base64 encoded image string
@@ -164,39 +164,40 @@ class PCClient:
                                 break
                         
                         # If still can't find a prediction, repeat the last command
-                        if ((image_prediction['data']['img_id'] == "Box") or (image_prediction['data']['img_id'] == None)) and NUM_OF_RETRIES > retries:
+                        if (image_prediction['data']['img_id'] == None) and (NUM_OF_RETRIES > retries):
 
-                            print("Found box!")
-                            
                             if command["type"] == "FASTEST_PATH":
                                 image_prediction['data']['img_id'] = "38" # 38 is right, 39 is left
                             else:
                                 #last_path = command['data']['path'][-1]
                                 #if (retries+1)%2==0:
-                                command = {"type": "NAVIGATION", "data": {"commands": ['FL045', 'FS010', 'FR045', 'FS025', 'BL090', 'RESET']}}
+                                #command = {"type": "NAVIGATION", "data": {"commands": ['FL045', 'FS010', 'FR045', 'FS025', 'BL090', 'RESET']}}
                                                                               #,"path": [last_path, last_path]}}
                                 #else:
                                     #command = {"type": "NAVIGATION", "data": {"commands": ['RB010','RF010'], "path": [last_path, last_path]}}
+                                pass
 
-                            self.msg_queue.put(json.dumps(command))
-                            print("No face found, sending commands")
-                            retries += 1
-                            continue
+                            #self.msg_queue.put(json.dumps(command))
+                            print("No face found")
+                            #retries += 1
+                            #continue
                             
                         # For checklist A.5
-                        else:
-                            print("Find the non-bulleye ended")
-                            return
+                        #else:
+                            #print("Find the non-bulleye ended")
+                            #return
 
                         # copy image to images_result folder and rename them according to obs_id
                         destination_folder = "images_result"
                         os.makedirs(destination_folder, exist_ok=True)
+                        
                         if self.task_2:
                             destination_file = f"{destination_folder}/task2_result_obs_id_{obs_id}.jpg"
                         else:
                             destination_file = f"{destination_folder}/task1_result_obs_id_{obs_id}.jpg"
                         image_path = image_prediction["image_path"] 
                         shutil.copy(image_path, destination_file)
+                
 
                         # Remove unnecessary data
                         del image_prediction["data"]["bbox_area"]
@@ -219,10 +220,11 @@ class PCClient:
                             command = self.t1.get_command_to_next_obstacle()
                             self.msg_queue.put(json.dumps(command))
                             obs_id = str(self.t1.get_obstacle_id())
+                            print("ID: ", obs_id)
                         else:
                             if not self.task_2:
                                 print("[Algo] Task 1 ended")
-                                #stitching_images(r'images_result', r'image_recognition\stitched_image.jpg')
+                                stitching_images(r'images_result', r'image_recognition\stitched_image.jpg')
                                 break # exit thread
 
                         self.image_record = [] # reset the image record
