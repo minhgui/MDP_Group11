@@ -342,13 +342,13 @@ public class GridMap extends View {
         showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
         int androidRowCoord = curCoord[1];
 
-        if ((androidRowCoord - 2) < 0 || androidRowCoord > 19) {
-            showLog("row is out of bounds");
-            return;
-        } else if (curCoord[0] > 20 || (curCoord[0] - 2) < 0) {
-            showLog("col is out of bounds");
-            return;
-        } else {
+//        if ((androidRowCoord - 2) < 0 || androidRowCoord > 19) {
+//            showLog("row is out of bounds");
+//            return;
+//        } else if (curCoord[0] > 20 || (curCoord[0] - 2) < 0) {
+//            showLog("col is out of bounds");
+//            return;
+//        } else {
             for (int y = androidRowCoord - 2; y <= androidRowCoord; y++) {
                 canvas.drawLine(
                         cells[curCoord[0] - 2][19 - y].startX,
@@ -367,7 +367,7 @@ public class GridMap extends View {
                         cells[x][19 - (androidRowCoord - 2)].startY,
                         robotColor
                 );
-            }
+//            }
 
             // use cells[initialCol][20 - initialRow] as ref
             switch (this.getRobotDirection()) {
@@ -530,10 +530,19 @@ public class GridMap extends View {
 
         row = this.convertRow(row);
         // cells[col][row] is the BOTTOM LEFT of the 2x2 robot
-        for (int x = col - 2; x <= col; x++)
-            for (int y = row - 2; y <= row; y++)
-                cells[x][y].setType("robot");
 
+        try {
+            // Your existing code that accesses the array
+            // For example:
+            for (int x = col - 2; x <= col; x++)
+                for (int y = row - 2; y <= row; y++)
+                    cells[x][y].setType("robot");
+
+        } catch (ArrayIndexOutOfBoundsException e) {
+            // Handle the exception here
+            showLog("Array out of bounds");
+
+        }
         showLog("Exiting setCurCoord");
     }
 
@@ -595,10 +604,17 @@ public class GridMap extends View {
             showLog("oldRow has gone out of grid.");
             return;
         }
-        for (int x = oldCol - 2; x <= oldCol; x++)
-            for (int y = oldRow - 2; y <= oldRow; y++)
-                cells[x][y].setType("explored");
-        showLog("Exiting setOldRobotCoord");
+        try{
+            for (int x = oldCol - 2; x <= oldCol; x++)
+                for (int y = oldRow - 2; y <= oldRow; y++)
+                    cells[x][y].setType("explored");
+            showLog("Exiting setOldRobotCoord");
+        }
+        catch (ArrayIndexOutOfBoundsException e)
+        {
+            showLog("ArrayOutOfBounds");
+        }
+
     }
 
     private int[] getOldRobotCoord() {
@@ -883,7 +899,7 @@ public class GridMap extends View {
 
             ToggleButton setStartPointToggleBtn = ((Activity) this.getContext())
                     .findViewById(R.id.startpointToggleBtn);
-            showLog("event.getX = " + event.getX() + ", event.getY = " + event.getY());
+            showLog("event.getX = " + event.getX() + ", event.getY = " + event.getY() + "cell size " + cellSize);
             showLog("row = " + row + ", column = " + column);
 
             try {
