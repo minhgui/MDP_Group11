@@ -47,6 +47,7 @@ public class Home extends Fragment {
 
     final Handler handler = new Handler();
     // Declaration Variables
+
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
     private static Context context;
@@ -454,6 +455,21 @@ public class Home extends Fragment {
                 Home.stopWk9TimerFlag=true;
                 timerHandler.removeCallbacks(ControlFragment.timerRunnableExplore);
                 timerHandler.removeCallbacks(ControlFragment.timerRunnableFastest);
+            }
+            else if(message.contains("path"))
+            {
+                // Extract the path section from the message
+                String pathPart = message.split("\"path\":")[1];
+                pathPart = pathPart.replaceAll("[\\[\\]{}]", "");
+                showLog("Extracted Full Path: " + pathPart);
+                String[] coordinates = pathPart.split(",");
+                for (int i = 2; i < coordinates.length; i += 2) {
+                    int x = Integer.parseInt(coordinates[i].trim());
+                    int y = Integer.parseInt(coordinates[i + 1].trim());
+                    gridMap.moveRobotCoords(x,y);
+                    showLog("Path Point: (" + x + ", " + y + ")");
+                }
+
             }
             else{
                 BluetoothCommunications.getMessageReceivedTextView().append("unknown message received");

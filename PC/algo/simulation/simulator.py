@@ -1,6 +1,6 @@
 import pygame
 import numpy as np
-from sys import exit
+from sys import exit 
 import os
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__ + '\..')))
