@@ -127,7 +127,7 @@ public class GridMap extends View {
         startColor.setColor(Color.CYAN);
         waypointColor.setColor(Color.GREEN);
         unexploredColor.setColor(getResources().getColor(R.color.skyBlue));
-        exploredColor.setColor(getResources().getColor(R.color.lighterYellow));
+        exploredColor.setColor(getResources().getColor(R.color.grassColor));
         arrowColor.setColor(Color.BLACK);
         fastestPathColor.setColor(Color.MAGENTA);
         Paint newpaint = new Paint();
@@ -349,6 +349,7 @@ public class GridMap extends View {
 //            showLog("col is out of bounds");
 //            return;
 //        } else {
+        try{
             for (int y = androidRowCoord - 2; y <= androidRowCoord; y++) {
                 canvas.drawLine(
                         cells[curCoord[0] - 2][19 - y].startX,
@@ -415,7 +416,10 @@ public class GridMap extends View {
                     ).show();
                     break;
             }
-        }
+        }}
+            catch (ArrayIndexOutOfBoundsException e){
+                showLog("ArrayIndexOutOfBoundsException");
+            }
         showLog("Exiting drawRobot");
     }
 
@@ -568,8 +572,10 @@ public class GridMap extends View {
         row = this.convertRow(row);
         // cells[col][row] is the BOTTOM LEFT of the 2x2 robot
         for (int x = col - 2; x <= col; x++)
-            for (int y = row - 2; y <= row; y++)
+            for (int y = row - 2; y <= row; y++) {
                 cells[x][y].setType("robot");
+//                showLog("x,y: " + x + " " + y);
+            }
 
         showLog("Exiting setCurCoord");
     }
@@ -901,7 +907,7 @@ public class GridMap extends View {
                     .findViewById(R.id.startpointToggleBtn);
             showLog("event.getX = " + event.getX() + ", event.getY = " + event.getY() + "cell size " + cellSize);
             showLog("row = " + row + ", column = " + column);
-
+            showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
             try {
                 oldItem = ITEM_LIST.get(initialRow - 1)[initialColumn - 1];
             } catch (IndexOutOfBoundsException e) {
@@ -1065,8 +1071,9 @@ public class GridMap extends View {
                     }
                 } else
                     canDrawRobot = true;
-                showLog("curCoord[0] = " + curCoord[0] + ", curCoord[1] = " + curCoord[1]);
+
                 this.setStartCoord(column, row);
+                showLog("Starting Coords" + column +" " + row);
                 startCoordStatus = false;
                 String direction = getRobotDirection();
                 if (direction.equals("None")) {
@@ -1231,12 +1238,13 @@ public class GridMap extends View {
             case "forward":
             case "back": {
                 Integer[] last = Straight.straight(newCoords, robotDirection, direction);
-                if (last[0] < 2 || last[1] < 1 || 21 <= last[0] || 20 <= last[1]) {
+                if (last[0] < 2 || last[1] < 1 || 21 <= last[0] || 19 <= last[1]) {
                     break;
                 }
 
                 curCoord[0] = last[0];
                 curCoord[1] = last[1];
+                showLog("Forward backward coords x: " + curCoord[0] + " y: " + curCoord[1]);
                 cells[curCoord[0]][20 - curCoord[1]].setType("explored");
                 validPosition = true;
             }
@@ -1245,7 +1253,7 @@ public class GridMap extends View {
             case "left": {
                 entry = Turn.turn(newCoords,robotDirection,"left");
                 Integer[] last = entry.getValue().get(entry.getValue().size() - 1);
-                if (last[0] < 2 || last[1] < 1 || 20 <= last[0] || 20 <= last[1]) {
+                if (last[0] < 2 || last[1] < 1 || 20 <= last[0] || 19 <= last[1]) {
                     break;
                 }
                 curCoord[0] = last[0];
@@ -1389,10 +1397,6 @@ public class GridMap extends View {
 //
 
 
-
-
-
-
         showLog("Enter checking for obstacles in destination 2x2 grid");
         if (getValidPosition())
             // check obstacle for new position
@@ -1448,14 +1452,13 @@ public class GridMap extends View {
             // Update the robot's coordinates if valid
             curCoord[0] = x;
             curCoord[1] = y;
-            this.invalidate();
-            // Update the cell type to 'explored' or whatever is appropriate
-            cells[curCoord[0]][20 - curCoord[1]].setType("explored");
 
+            // Update the cell type to 'explored' or whatever is appropriate
+//            cells[curCoord[0]][20 - curCoord[1]].setType("explored");
             // Set the robot's new coordinates
             this.setCurCoord2(curCoord[0], curCoord[1]);
             setValidPosition(true); // Mark the position as valid
-
+            this.invalidate();
             showLog("Moved robot to new coordinates: (" + x + ", " + y + ")");
         } else {
             // If the move is invalid, revert to the old coordinates

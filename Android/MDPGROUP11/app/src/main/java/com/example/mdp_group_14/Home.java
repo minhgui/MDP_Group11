@@ -397,27 +397,35 @@ public class Home extends Fragment {
             //image format from RPI is "TARGET~<obID>~<ImValue>" eg TARGET~3~7
             else if(message.contains("TARGET")) {
                 try {
-                    String[] cmd = message.split(",");
-                    String temp2="-1";
-                    BluetoothCommunications.getMessageReceivedTextView().append("Obstacle no: " + cmd[1]+ "TARGET ID: " + cmd[2] + "\n");
+                    // Split at the first two commas to ensure cmd[2] contains the target ID
+                    String[] cmd = message.split(",", 3);
 
-//                    if (cmd[2].contains("STOP"))
-//                    {
-//                        String temp=cmd[2];
-//                        String[] temp1=temp.split(" ");
-//                        temp2=temp1[0];
-//
-//                    }
+                    String obstacleNumber = cmd[1].trim();  // "5"
+                    String targetID = cmd[2].trim();  // Could be "20{..." or "3{..." or "99{..."
 
-                    gridMap.updateIDFromRpi(String.valueOf(Integer.valueOf(cmd[1])-1), cmd[2]);
-                    obstacleID = String.valueOf(Integer.valueOf(cmd[1]) - 2);
+                    // Remove everything after '{' to keep only the target ID
+                    if (targetID.contains("{")) {
+                        targetID = targetID.split("\\{", 2)[0].trim();
+                    }
 
+                    BluetoothCommunications.getMessageReceivedTextView()
+                            .append("Obstacle no: " + obstacleNumber + " TARGET ID: " + targetID + "\n");
 
-//                    int ob= Integer.parseInt(obstacleID);
+                    gridMap.updateIDFromRpi(String.valueOf(Integer.parseInt(obstacleNumber) - 1), targetID);
+                    obstacleID = String.valueOf(Integer.parseInt(obstacleNumber) - 2);
 
+                    String pathPart = message.split("\"path\":")[1];
+                    pathPart = pathPart.replaceAll("[\\[\\]{}]", "");
+                    showLog("Extracted Full Path: " + pathPart);
+                    String[] coordinates = pathPart.split(",");
+                    for (int i = 2; i < coordinates.length; i += 2) {
+                        int x = Integer.parseInt(coordinates[i].trim());
+                        int y = Integer.parseInt(coordinates[i + 1].trim());
+                        gridMap.moveRobotCoords(x+2,y);
+                        showLog("Path Point: (" + x + ", " + y + ")");
+                    }
                 }
-                catch(Exception e)
-                {
+                catch(Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -466,7 +474,7 @@ public class Home extends Fragment {
                 for (int i = 2; i < coordinates.length; i += 2) {
                     int x = Integer.parseInt(coordinates[i].trim());
                     int y = Integer.parseInt(coordinates[i + 1].trim());
-                    gridMap.moveRobotCoords(x,y);
+                    gridMap.moveRobotCoords(x+2,y);
                     showLog("Path Point: (" + x + ", " + y + ")");
                 }
 
