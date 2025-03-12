@@ -76,7 +76,7 @@ public class BluetoothSetUp extends Fragment {
     SharedPreferences.Editor editor;
 
     BluetoothConnectionService mBluetoothConnection;
-    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private static final UUID MY_UUID = UUID.fromString("5BAD6310-FF24-11EF-AC77-0800200C9A66");
     public static BluetoothDevice mBTDevice;
 
     boolean retryConnection = false;
