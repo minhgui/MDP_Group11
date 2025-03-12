@@ -311,9 +311,18 @@ public class MappingFragment extends Fragment {
                         String dir = savedDirection.equals("up") ? "NORTH" :
                                 savedDirection.equals("down") ? "SOUTH" :
                                         savedDirection.equals("left") ? "WEST" : "EAST";
-
+                        // Center center
                         Home.printMessage("ROBOT," + (savedX - 1) + "," + (savedY + 1) + "," + dir.toUpperCase() + "," + "Z");
                         showLog("ROBOT," + (savedX -1 ) + "," + (savedY + 1) + "," + dir.toUpperCase() + "," + "Z");
+
+                        //Bottom center
+                        //Home.printMessage("ROBOT," + (savedX - 1) + "," + (savedY) + "," + dir.toUpperCase() + "," + "Z");
+
+                        //Bottom right
+                        //Home.printMessage("ROBOT," + (savedX ) + "," + (savedY) + "," + dir.toUpperCase() + "," + "Z");
+
+                        //Bottom left
+                        //Home.printMessage("ROBOT," + (savedX - 2) + "," + (savedY) + "," + dir.toUpperCase() + "," + "Z");
 
                         showLog("Loaded robot at X: " + (savedX - 1) + ", Y: " + (savedY + 1) + ", Direction: " + savedDirection);
                     }
