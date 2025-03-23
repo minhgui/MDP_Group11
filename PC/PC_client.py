@@ -6,47 +6,58 @@ import json
 import time
 import shutil
 import base64
+from ultralytics import YOLO
+from pathlib import Path
+from datetime import datetime
 
-from image_recognition import model_inference
 from algo.pathfinding import task1
 from image_recognition.stitch_images import stitching_images
 
-image_id_map = []
+# Configurations
+MODEL_CONFIG = {
+    "conf": 0.850, 
+    "path": Path("image_recognition") / "best_task_2_ncnn_model"
+}
 
-# Configuration
-TASK_2 = False #Change to False for task 1, True for task 2
+TASK_2 = True #False for task 1, True for task 2
 
 # Constants
-RPI_IP = "192.168.11.1"  # Replace with the Raspberry Pi's IP address
-PC_PORT = 8888  # Replace with the port used by the PC server
-PC_BUFFER_SIZE = 1024
+RPI_IP = "192.168.11.1"  # Raspberry Pi's IP address
+PC_PORT = 8888  
 NUM_OF_RETRIES = 3
+
 
 class PCClient:
     def __init__(self):
-        # Initialize PCClient with connection details
+        # Connection details
         self.host = RPI_IP
         self.port = PC_PORT
         self.client_socket = None
         self.msg_queue = Queue()
         self.send_message = False
+
+        # Task utils
         self.t1 = task1.task1()
         self.image_record = []
         self.task_2 = TASK_2
         self.obs_order_count = 0
 
+        # Image Inferencing Model
+        model_path = MODEL_CONFIG["path"]
+        self.model = YOLO(model_path)
+        self.conf = MODEL_CONFIG["conf"]
+
+#   =================================== Connection functions =================================
+
     def connect(self):
-        # Establish a connection with the PC
-        retries:int = 0
-        while not self.send_message:  # Keep trying until successful connection
+        while not self.send_message: 
             try:
                 self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 self.client_socket.connect((self.host, self.port))
                 self.send_message = True
                 print("[PC Client] Connected to PC successfully.")
             except socket.error as e:
-                retries += 1
-                print("[PC Client] ERROR: Failed to connect -", str(e), "Retry no." + str(retries), "in 1 second...")
+                print("[PC Client] ERROR: Failed to connect, retrying in 1 second.")
                 time.sleep(1)
 
     def disconnect(self):
@@ -65,6 +76,8 @@ class PCClient:
         self.send_message = False
         self.disconnect()
         self.connect()
+
+#   =================================== Data functions =================================
 
     def send(self):
         while True:
@@ -87,11 +100,81 @@ class PCClient:
         length_bytes = message_len.to_bytes(4, byteorder="big")
         return length_bytes + message_bytes
 
+    def receive_all(self, size):
+        data = b""
+        while len(data) < size:
+            chunk = self.client_socket.recv(size - len(data))
+            if not chunk:
+                raise ConnectionError("Connection closed unexpectedly")
+            data += chunk
+        return data
+    
+#   =================================== Task functions =================================
+
+    def image_inference(self, image_or_path, obs_id, image_counter, task_2:bool=True):
+        formatted_time = datetime.fromtimestamp(time.time()).strftime('%d-%m_%H-%M')
+        img = f"img_{formatted_time}"
+
+        # Run inference
+        try:
+            results = self.model.predict(source=image_or_path, verbose=False, project="./captured_images", 
+                                         name=f"{img}_1", save=True, save_txt=True, save_conf=True, 
+                                         imgsz=640, conf=self.conf)
+        except Exception as e:
+            print(f"Error running inference: {e}")
+            return None
+
+        # Process results
+        bboxes = []
+        for r in results:
+            for c in r:
+                label = c.names[c.boxes.cls.tolist().pop()].split("_")[0]
+                bboxes.append({"label": label, "xywh": c.boxes.xywh.tolist().pop()})
+
+        results[0].show()
+
+        max_label, max_area = self.find_best_label(bboxes)
+        if max_area:
+            img = img + "_1"          
+
+        name_of_image = f"task2_obs_id_{obs_id}_{image_counter}.jpg" if task_2 else f"task1_obs_id_{obs_id}_{image_counter}.jpg"
+
+        image_pred = {
+            "type": "IMAGE_RESULTS",
+            "data": {"obs_id": obs_id, 
+                     "img_id": max_label, 
+                     "bbox_area": max_area},
+            "image_path": str(Path("captured_images") / f"{img}" / name_of_image)
+        }
+
+        return image_pred
+
+    def find_best_label(self, bboxes):
+        max_area = 0.0
+        max_label = None
+
+        for bbox in bboxes: 
+            label = bbox['label']
+            _, _, width, height = bbox['xywh']
+
+            # Ignore label for bullseye
+            if label == "41":
+                continue  
+            # Factor in '1' being thinner
+            if label == "11":
+                width *= 1.4
+
+            bbox_area = width * height
+            if bbox_area > max_area:
+                max_area = bbox_area
+                max_label = label
+
+        return max_label, max_area
+
     def receive_messages(self):
         try:
             image_counter = 0
             obs_id = 0
-            retries = 0
             command = None
             while True:
                 # Receive the length of the message
@@ -110,30 +193,18 @@ class PCClient:
                 print("[PC Client] Received message: first 200:", message[:200])
 
                 message = json.loads(message)
-                if message["type"] == "START_TASK":
-                    # Add algo implementation here:
-                    self.t1.generate_path(message)
-                    command = self.t1.get_command_to_next_obstacle() # get command to next, will pop from list automatically
-                    obs_id = str(self.t1.get_obstacle_id())
-                    # Test code below
-                    # command = {"type": "NAVIGATION", "data": {"commands": ["FL180"], "path": [[1, 2], [1, 3], [1, 4], [1, 5], [2, 5], [3, 5], [4, 5]]}}
-                    # End of test code
-                    self.msg_queue.put(json.dumps(command))
-
-                elif message["type"] == "FASTEST_PATH":
-                    command = {"type": "FASTEST_PATH"}
-                    self.msg_queue.put(json.dumps(command))
                 
-                #elif message["type"] == "test":
-                    #message = {"type": "IMAGE_RESULTS", "data": {"obs_id": "3", "img_id": "39"}}
-                    #self.msg_queue.put(json.dumps(message))
+                # Task 1 start
+                if message["type"] == "START_TASK":
+                    self.t1.generate_path(message)
+                    command = self.t1.get_command_to_next_obstacle() 
+                    obs_id = str(self.t1.get_obstacle_id())
+                    self.msg_queue.put(json.dumps(command))
 
+                # Call image recognition
                 elif message["type"] == "IMAGE_TAKEN":
-                    #command = {"type": "IMAGE_TAKEN"} # remove after test
-                    # Add image inference implementation here:
-                    encoded_image = message["data"]["image"]
-                    # Decode the base64 encoded image string
-                    decoded_image = base64.b64decode(encoded_image)
+                    encode_image = message["data"]["image"]
+                    decode_image = base64.b64decode(encode_image)
                     os.makedirs("captured_images", exist_ok=True)
 
                     if self.task_2:
@@ -142,104 +213,81 @@ class PCClient:
                         image_path = f"captured_images/task1_obs_id_{obs_id}_{image_counter}.jpg"
                     
                     with open(image_path, "wb") as img_file:
-                        img_file.write(decoded_image)
+                        img_file.write(decode_image)
 
-                    image_prediction = model_inference.image_inference(image_or_path=image_path, obs_id=str(obs_id), 
-                                                                   image_counter=image_counter, 
-                                                                   image_id_map=image_id_map, 
-                                                                   task_2=self.task_2)
-                    print(image_prediction['data']['img_id'])
-                    if image_prediction['data']['img_id'] != None:
-                        print("Image detected with ID: ", image_prediction['data']['img_id'])
-                    self.image_record.append(image_prediction)
+                    image_pred = self.image_inference(image_or_path=image_path, obs_id=str(obs_id), 
+                                                            image_counter=image_counter, task_2=self.task_2)
+                    
+                    # print(image_pred['data']['img_id']) 
+
+                    if image_pred['data']['img_id'] != None:
+                        print("[PC Client] Image detected with ID: ", image_pred['data']['img_id'])
+                    self.image_record.append(image_pred)
                     image_counter += 1
 
                     if message["final_image"] == True:
                         
                         # Get last prediction and move forward
-                        while image_prediction['data']['img_id'] == None and self.image_record is not None:
+                        while image_pred['data']['img_id'] == None and self.image_record is not None:
                             if self.image_record:
-                                image_prediction = self.image_record.pop()
+                                image_pred = self.image_record.pop()
                             else:
                                 break
                         
-                        # If still can't find a prediction, repeat the last command
-                        if (image_prediction['data']['img_id'] == None) and (NUM_OF_RETRIES > retries):
-
-                            if command["type"] == "FASTEST_PATH":
-                                image_prediction['data']['img_id'] = "38" # 38 is right, 39 is left
-                            else:
-                                #last_path = command['data']['path'][-1]
-                                #if (retries+1)%2==0:
-                                #command = {"type": "NAVIGATION", "data": {"commands": ['FL045', 'FS010', 'FR045', 'FS025', 'BL090', 'RESET']}}
-                                                                              #,"path": [last_path, last_path]}}
-                                #else:
-                                    #command = {"type": "NAVIGATION", "data": {"commands": ['RB010','RF010'], "path": [last_path, last_path]}}
-                                pass
-
-                            #self.msg_queue.put(json.dumps(command))
-                            print("No face found")
-                            #retries += 1
-                            #continue
-                            
                         # For checklist A.5
-                        #else:
-                            #print("Find the non-bulleye ended")
-                            #return
+                        # if (image_pred['data']['img_id'] == None) and (NUM_OF_RETRIES > retries):
+                        #     data_send = {"type": "NAVIGATION", 
+                        #                  "data": {"commands": ['FL045', 'FS010', 'FR045', 'FS025', 'BL090', 'RESET']}, "path": []},
 
-                        # copy image to images_result folder and rename them according to obs_id
+                        #     self.msg_queue.put(json.dumps(data_send))
+                        #     print("No face found")
+                        #     retries += 1
+                        #     continue
+                            
+                        # else:
+                        #     print("Find the non-bulleye ended")
+                        #     return
+
                         destination_folder = "images_result"
                         os.makedirs(destination_folder, exist_ok=True)
-                        
+                            
                         if self.task_2:
                             destination_file = f"{destination_folder}/task2_result_obs_id_{obs_id}.jpg"
                         else:
                             destination_file = f"{destination_folder}/task1_result_obs_id_{obs_id}.jpg"
-                        image_path = image_prediction["image_path"] 
-                        shutil.copy(image_path, destination_file)
-                
+                        image_path = image_pred["image_path"] 
+                        
+                        if (image_pred['data']['img_id'] != None):
+                            shutil.copy(image_path, destination_file)
 
-                        # Remove unnecessary data
-                        del image_prediction["data"]["bbox_area"]
-                        del image_prediction["image_path"]
-
-                        message = json.dumps(image_prediction)
+                        message = json.dumps(image_pred)
                         self.msg_queue.put(message)
-                        self.t1.update_image_id(image_prediction['data']['img_id'])
+                        self.t1.update_image_id(image_pred['data']['img_id'])
                         image_counter = 0
-                        retries = 0
                         if self.task_2:
-                            obs_id += 1 # because PC server doesn't send ID
+                            obs_id += 1 
 
-                        # For testing
-                        # message = {"type": "IMAGE_RESULTS", "data": {"obs_id": "3", "img_id": "20"}}
-                        # end of temp test code
+                        # For task 1
+                        # if not self.t1.has_task_ended():
+                        #     command = self.t1.get_command_to_next_obstacle()
+                        #     self.msg_queue.put(json.dumps(command))
+                        #     obs_id = str(self.t1.get_obstacle_id())
+                        #     print("ID: ", obs_id)
+                        # else:
+                        #     print("[Algo] Task 1 ended")
+                        #     stitching_images(r'images_result', r'image_recognition\stitched_image.jpg')
+                        #     break # exit thread
 
-                        # Update self.t1 to input new path, may put this above the image inference if we don't want to wait and stop
-                        if not self.t1.has_task_ended():
-                            command = self.t1.get_command_to_next_obstacle()
-                            self.msg_queue.put(json.dumps(command))
-                            obs_id = str(self.t1.get_obstacle_id())
-                            print("ID: ", obs_id)
-                        else:
-                            if not self.task_2:
-                                print("[Algo] Task 1 ended")
-                                stitching_images(r'images_result', r'image_recognition\stitched_image.jpg')
-                                break # exit thread
+                        # For task 2 
+                        if obs_id == 2:
+                            print("Task 2 ended")
+                            stitching_images(r'images_result', r'image_recognition\stitched_image.jpg')
+                            break 
 
                         self.image_record = [] # reset the image record
 
         except socket.error as e:
             print("[PC Client] ERROR:", str(e))
-
-    def receive_all(self, size):
-        data = b""
-        while len(data) < size:
-            chunk = self.client_socket.recv(size - len(data))
-            if not chunk:
-                raise ConnectionError("Connection closed unexpectedly")
-            data += chunk
-        return data
     
 
 if __name__ == "__main__":
@@ -251,13 +299,13 @@ if __name__ == "__main__":
     PC_client_send = threading.Thread(target=client.send, name="PC-Client_send_thread")
 
     PC_client_send.start()
-    print("[PC Client] Sending threads started successfully")
+    print("[PC Client] Sending threads successfully started")
 
     PC_client_receive.start()
-    print("[PC Client] Listening threads started successfully")
+    print("[PC Client] Listening threads successfully started")
 
     PC_client_receive.join()
     PC_client_send.join()
-    print("[PC Client] All threads concluded, cleaning up...")
+    print("[PC Client] All threads concluded")
 
     client.disconnect()

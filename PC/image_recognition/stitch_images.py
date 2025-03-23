@@ -2,14 +2,13 @@ from PIL import Image
 import os
 import math
 
-
 def stitching_images(image_folder_path, output_img_path):
     print("Stitching images...")
     # Initialize the big image
     big_img = Image.new('RGB', (2400, 2400))
 
     # Get a list of all image files in the input folder
-    image_files = [f for f in os.listdir(image_folder_path) if f.endswith(('.jpg', '.png', '.jpeg'))]
+    image_files = [f for f in os.listdir(image_folder_path)]
     image_num = len(image_files)
 
     num_of_columns = 3
