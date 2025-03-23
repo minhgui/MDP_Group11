@@ -112,7 +112,7 @@ class PCClient:
 #   =================================== Task functions =================================
 
     def image_inference(self, image_or_path, obs_id, image_counter, task_2:bool=True):
-        formatted_time = datetime.fromtimestamp(time.time()).strftime('%d-%m_%H-%M')
+        formatted_time = datetime.fromtimestamp(time.time()).strftime('%d-%m_%H-%M-%S')
         img = f"img_{formatted_time}"
 
         # Run inference

@@ -14,6 +14,7 @@ class PCInterface:
         self.send_message = False
         self.obs_id = 1
         self.task2 = task2
+        self.check = True
         
 
     def connect(self):
@@ -23,13 +24,12 @@ class PCInterface:
 
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) #allow the socket to be reused immediately after it is closed
+                sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
                 print("[PC] Socket established successfully.")
                 sock.bind((self.host, self.port))
                 sock.listen(128)
-
                 print("[PC] Waiting for PC connection...")
-                self.client_socket, self.address = sock.accept() #blocks until a client connects to the server
+                self.client_socket, self.address = sock.accept() 
                 self.send_message = True
         except socket.error as e:
             print("[PC] ERROR: Failed to connect -", str(e))
@@ -54,7 +54,7 @@ class PCInterface:
 
     def listen(self):
         # Continuously listen for messages from the PC
-        while True:
+        while self.check:
             try:
                 if self.client_socket is not None:
                     # # Receive the length of the message
@@ -80,42 +80,43 @@ class PCInterface:
                     msg_type = parsed_msg["type"]
 
                     # Route messages to the appropriate destination
-                    # PC -> Rpi -> STM
                     if msg_type == 'NAVIGATION':
+                        # Send commands to STM 
                         print("[RPI] Sending message to STM: ", parsed_msg["data"]["commands"])
                         self.RPiMain.STM.msg_queue.put(message)
+                        # Send path to Android
                         print("[RPI] Sending message to Android: ", parsed_msg["data"]["path"])
                         self.RPiMain.Android.msg_queue.put(message)
 
-                    # PC -> Rpi -> Android
-                    elif msg_type == 'IMAGE_RESULTS' or msg_type in ['COORDINATES', 'PATH']:
-                        # Real code
+                    elif msg_type == 'IMAGE_RESULTS':
+                        # Send image to Android (commented out for task 2)
                         encode_message = decoded_msg.encode("utf-8")
                         self.RPiMain.Android.msg_queue.put(encode_message) 
-                        print("[RPI]: Send to Android: ", encode_message) #TODO: comment if no android connection during testing
+                        print("[RPI]: Send to Android: ", encode_message) 
+
+                        # Task 2 logic
                         if self.task2:
                             if self.obs_id == 1:
-                                if parsed_msg["data"]["img_id"] == "39": #left
-                                    direction = "FIRSTLEFT"
+                                if parsed_msg["data"]["img_id"] == "39": 
+                                    path_message = {"type": "NAVIGATION", "data": {"commands": ["OBS1L", "OBS2U"], "path": []}}
                                 else:
-                                    direction = "FIRSTRIGHT"
-                                path_message = {"type": "NAVIGATION", "data": {"commands": [direction, "BS025", "YF150"], "path": []}}
+                                    path_message = {"type": "NAVIGATION", "data": {"commands": ["OBS1R", "OBS2U"], "path": []}}
                                 self.obs_id += 1
                             else:
-                                if parsed_msg["data"]["img_id"] == "39": #left
-                                    direction = "SECONDLEFT"
+                                if parsed_msg["data"]["img_id"] == "39": 
+                                    path_message = {"type": "NAVIGATION", "data": {"commands": ["OBS2L"], "path": []}}
+                                    self.check = False # Stop sending commands (ensure commands do not loop)
                                 else:
-                                    direction = "SECONDRIGHT"
-                                path_message = {"type": "NAVIGATION", "data": {"commands": [direction], "path": []}}
-                            
+                                    path_message = {"type": "NAVIGATION", "data": {"commands": ["OBS2R"], "path": []}}
+                                    self.check = False # Stop sending commands (ensure commands do not loop)
+
                             json_path_message = json.dumps(path_message)
                             encode_path_message = json_path_message.encode("utf-8")
                             self.RPiMain.STM.msg_queue.put(encode_path_message)
-                        # Temp code: pass
-                        # pass
 
+                    # Start task 2
                     elif msg_type == "FASTEST_PATH":
-                        path_message = {"type": "NAVIGATION", "data": {"commands": ["YF150"], "path": []}}
+                        path_message = {"type": "NAVIGATION", "data": {"commands": ["OBS1U"], "path": []}}
                         json_path_message = json.dumps(path_message)
                         encode_path_message = json_path_message.encode("utf-8")
                         self.RPiMain.STM.msg_queue.put(encode_path_message)
@@ -131,33 +132,12 @@ class PCInterface:
 
     def send(self):
         # Continuously send messages to the PC Client
-        i=2 # test code
         while True:
             if self.send_message:
-                # for testing
-                if i==1:
-                    pass
-                #     message_ori = {
-                #         "type": "FASTEST_PATH",
-                #         "data": {
-                #         "task": "FASTEST_PATH",
-                #         "robot": {"id": "R", "x": 1, "y": 1, "dir": 'N'},
-                #         "obstacles": [
-                #                 {"id": "00", "x": 4, "y": 15, "dir": 'S'},
-                #                 {"id": "01", "x": 16, "y": 17, "dir": 'W'}
-                #         ]
-                #         }
-                #     }
-                #     message = json.dumps(message_ori)
-                #     i+=1
-                # end of test code
-                else:
-                    # uncomment once ready
-                    message = self.msg_queue.get()
-                    message = message.decode("utf-8")
-
-                
+                message = self.msg_queue.get()
+                message = message.decode("utf-8")
                 exception = True
+
                 while exception:
                     try:
                         message = self.prepend_msg_size(message)

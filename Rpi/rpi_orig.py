@@ -44,20 +44,19 @@ class RPiMain:
         Android_listen = Thread(target=self.Android.listen, name="Android_listen_thread")
         PC_listen = Thread(target=self.PC.listen, name="PC_listen_thread")
 
-        # Start sending threads
+        # Sending threads
         Android_send.start()
         PC_send.start()
         STM_send.start()
         print("[RPiMain] Sending threads started successfully")
 
-        # Start listening threads
+        # Listening threads
         Android_listen.start()
         PC_listen.start()
         print("[RPiMain] Listening threads started successfully")
         
-        #one-by-one sending commands
+        # Test commands
         #self.STM.send2()
-        #self.STM.send_image_to_pc(True)
 	
         # Wait for threads to end
         Android_send.join()
@@ -65,13 +64,12 @@ class RPiMain:
         STM_send.join()
         Android_listen.join()
         PC_listen.join()
-        print("sent command")
-        print("[RPiMain] All threads concluded, cleaning up...")
+        print("[RPiMain] All threads concluded")
 
         # Cleanup after threads finish
         self.cleanup()
 
-        print("[RPiMain] Exiting RPiMain...")
+        print("[RPiMain] Exiting")
 
 if __name__ == "__main__":
     rpi = RPiMain(TASK_2)
