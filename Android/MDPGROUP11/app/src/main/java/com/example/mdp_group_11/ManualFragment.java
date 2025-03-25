@@ -19,8 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-public class EmergencyFragment extends DialogFragment {
-    private static final String TAG = "EmergencyFragment";
+public class ManualFragment extends DialogFragment {
+    private static final String TAG = "ManualFragment";
     View rootView;
     private SharedPreferences.Editor editor;
     Button addManualBtn, cancelBtn;

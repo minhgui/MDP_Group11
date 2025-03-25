@@ -12,7 +12,6 @@ import androidx.viewpager.widget.ViewPager;
 import com.google.android.material.tabs.TabLayout;
 
 public class MainActivity extends AppCompatActivity {
-
     private static Context context;
 
     @Override
@@ -29,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
         sectionsPagerAdapter2.addFragment(new Home(),"Home");
         sectionsPagerAdapter2.addFragment(new BluetoothSetUp(),"Bluetooth");
-        sectionsPagerAdapter2.addFragment(new EmergencyFragment(),"Add Obstacle");
+        sectionsPagerAdapter2.addFragment(new ManualFragment(),"Add Obstacle");
 
         ViewPager viewPager2 = findViewById(R.id.view_pager2);
         viewPager2.setAdapter(sectionsPagerAdapter2);

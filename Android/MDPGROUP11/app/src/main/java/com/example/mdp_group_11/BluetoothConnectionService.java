@@ -21,13 +21,13 @@ import java.util.UUID;
 
 public class BluetoothConnectionService {
     private static final String TAG = "Debugging Tag";
-    private static final String appName = "MDP_Grp_14";
+    private static final String appName = "MDP_Grp_11";
     private static final UUID MY_UUID = UUID.fromString("5BAD6310-FF24-11EF-AC77-0800200C9A66");
 
     private final BluetoothAdapter mBluetoothAdapter;
     Context mContext;
 
-    private AcceptThread mInsecureAcceptThread;
+    private AcceptThread mAcceptThread;
 
     private ConnectThread mConnectThread;
     private BluetoothDevice mmDevice;
@@ -155,9 +155,9 @@ public class BluetoothConnectionService {
         }
 
         //If accept thread is null we want to start a new one
-        if(mInsecureAcceptThread == null){
-            mInsecureAcceptThread = new AcceptThread();
-            mInsecureAcceptThread.start();
+        if(mAcceptThread == null){
+            mAcceptThread = new AcceptThread();
+            mAcceptThread.start();
         }
     }
 
@@ -252,9 +252,9 @@ public class BluetoothConnectionService {
     private void connected(BluetoothSocket mSocket, BluetoothDevice device) {
         Log.d(TAG, "connected: Starting.");
         mmDevice =  device;
-        if (mInsecureAcceptThread != null) {
-            mInsecureAcceptThread.cancel();
-            mInsecureAcceptThread = null;
+        if (mAcceptThread != null) {
+            mAcceptThread.cancel();
+            mAcceptThread = null;
         }
 
         mConnectedThread = new ConnectedThread(mSocket);

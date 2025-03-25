@@ -26,9 +26,6 @@ public class MappingFragment extends Fragment {
     ImageButton resetMapBtn, saveMapObstacle, loadMapObstacle;
     ImageButton directionChangeImageBtn, obstacleImageBtn;
     ToggleButton setStartPointToggleBtn;
-    ImageView emergencyBtn; // testing
-    int clicks = 0;
-    final int THRESHOLD = 5;    // no. of clicks before triggering
     GridMap gridMap;
 
     Switch dragSwitch;
@@ -36,7 +33,6 @@ public class MappingFragment extends Fragment {
 
     static String imageID="";
     static String imageBearing="North";
-    static String path="LL";
     static boolean dragStatus;
     static boolean changeObstacleStatus;
 
@@ -59,7 +55,7 @@ public class MappingFragment extends Fragment {
             direction = savedInstanceState.getString("direction");
         gridMap = Home.getGridMap();
         final DirectionsFragment directionFragment = new DirectionsFragment();
-        final EmergencyFragment emergencyFragment = new EmergencyFragment();
+        final ManualFragment manualFragment = new ManualFragment();
 
         resetMapBtn = root.findViewById(R.id.resetBtn);
         setStartPointToggleBtn = root.findViewById(R.id.startpointToggleBtn);

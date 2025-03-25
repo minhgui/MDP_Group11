@@ -3,14 +3,11 @@ package com.example.mdp_group_11;
 import android.util.Log;
 import android.widget.Toast;
 
-// To translate the relayed path given from algo to rpi and then to android to update robot position in "real-time"
-// Basically will involve converting stm commands into its 'equivalent' on the 20x20 grid map
 public class PathTranslator {
     private static final String TAG = "PathTranslator";
     private static GridMap gridMap;
     private static final int CELL_LENGTH = 10; //length of each cell in cm
     private static final int MILLI_DELAY = 200;    // delay between movement commands
-
     private int curX, curY;
     private String dir;
 
@@ -47,6 +44,7 @@ public class PathTranslator {
                 commandType = 'b';
             }
         }
+
         //Case 2: is a TURN command. Expects a syntax of eg. TURN,<DIRECTION>.
         else if (stmCommand.contains("TURN")){
             String direction = stmCommand.split(",")[1];
@@ -77,7 +75,6 @@ public class PathTranslator {
                     if (gridMap.getValidPosition()){
                         showLog("moving forward");}
                     else {
-//                        Home.printMessage("obstacle");
                         showLog("Unable to move forward");
                     }
 

@@ -25,7 +25,7 @@ public class ControlFragment extends Fragment {
     SharedPreferences sharedPreferences;
 
     // Control Button
-    ImageButton moveForwardImageBtn, turnRightImageBtn, moveBackImageBtn, turnLeftImageBtn,turnbleftImageBtn,turnbrightImageBtn;
+    ImageButton moveForwardImageBtn, turnRightImageBtn, moveBackImageBtn, turnLeftImageBtn, turnBackLeftImageBtn, turnBackRightImageBtn;
     ImageButton exploreResetButton, fastestResetButton;
     private static long exploreTimer, fastestTimer;
     public static ToggleButton exploreButton, fastestButton;
@@ -88,8 +88,8 @@ public class ControlFragment extends Fragment {
         turnRightImageBtn = Home.getRightBtn();
         moveBackImageBtn = Home.getDownBtn();
         turnLeftImageBtn = Home.getLeftBtn();
-        turnbleftImageBtn = Home.getbLeftBtn();
-        turnbrightImageBtn = Home.getbRightBtn();
+        turnBackLeftImageBtn = Home.getbLeftBtn();
+        turnBackRightImageBtn = Home.getbRightBtn();
         exploreTimeTextView = root.findViewById(R.id.exploreTimeTextView2);
         fastestTimeTextView = root.findViewById(R.id.fastestTimeTextView2);
         exploreButton = root.findViewById(R.id.exploreToggleBtn2);
@@ -141,7 +141,7 @@ public class ControlFragment extends Fragment {
                 showLog("Exiting turnRightImageBtn");
             }
         });
-        turnbrightImageBtn.setOnClickListener(new View.OnClickListener() {
+        turnBackRightImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showLog("Clicked turnbRightImageBtn");
@@ -191,7 +191,7 @@ public class ControlFragment extends Fragment {
                 showLog("Exiting turnLeftImageBtn");
             }
         });
-        turnbleftImageBtn.setOnClickListener(new View.OnClickListener() {
+        turnBackLeftImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 showLog("Clicked turnbLeftImageBtn");
