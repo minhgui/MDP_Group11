@@ -23,7 +23,7 @@
 
                 <view
                     android:id="@+id/mapView"
-                    class="com.example.mdp_group_14.GridMap"
+                    class="com.example.mdp_group_11.GridMap"
                     android:layout_width="match_parent"
                     android:layout_height="430dp" />
 
@@ -52,8 +52,6 @@
                     android:textAlignment="center"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
-                <!--        app:drawableLeftCompat="@mipmap/left"
-        app:drawableRightCompat="@mipmap/right"-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -94,9 +92,6 @@
                     android:textAlignment="center"
                     android:textColor="@color/black"
                     android:textStyle="bold" />
-                <!--
-            app:drawableLeftCompat="@mipmap/left"
-            app:drawableRightCompat="@mipmap/right"-->
 
                 <TextView
                     android:id="@+id/robotStatus"
@@ -121,9 +116,6 @@
                     android:text="DIRECTION"
                     android:textAlignment="center"
                     android:textColor="@color/black" />
-                <!--
-            app:drawableLeftCompat="@mipmap/left"
-            app:drawableRightCompat="@mipmap/right"-->
 
                 <TextView
                     android:id="@+id/directionAxisTextView"
@@ -148,9 +140,6 @@
                     android:text="COORDINATES"
                     android:textAlignment="center"
                     android:textColor="@color/black" />
-                <!--        android:drawableLeft="@mipmap/left"
-            android:drawableRight="@mipmap/right"-->
-
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -278,7 +267,6 @@
                             android:background="@color/transparent"
                             android:foreground="@drawable/move_left" />
 
-                        <!--                        android:background="@drawable/circular_button"-->
                         <ImageButton
                             android:id="@+id/upBtn"
                             android:layout_width="50dp"

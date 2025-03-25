@@ -28,9 +28,7 @@
                     android:text="TASK 1"
                     android:textColor="@color/black"
                     android:textSize="20sp" />
-                <!--                app:drawableStartCompat="@mipmap/left"
-                    app:drawableEndCompat="@mipmap/right"-->
-                <!--                android:background="@drawable/statusbar"-->
+
                 <TextView
                     android:id="@+id/exploreTimeTextView2"
                     android:layout_width="180dp"
@@ -49,9 +47,6 @@
                     android:text="Exploration"
                     android:textOff="TASK 1 START"
                     android:textOn="STOP" />
-                <!--                android:drawableEnd="@mipmap/qqqq"
-                    android:background="@drawable/border_black_state"-->
-
 
                 <ImageButton
                     android:id="@+id/exploreResetImageBtn2"
@@ -61,9 +56,6 @@
                     android:layout_marginStart="65dp"
                     android:layout_marginTop="30dp"
                     android:background="@color/transparent" />
-
-
-                <!--                app:srcCompat="@drawable/ic_refresh"-->
 
             </LinearLayout>
         </LinearLayout>
@@ -87,9 +79,7 @@
                     android:text="TASK 2"
                     android:textColor="@color/black"
                     android:textSize="20sp" />
-                <!--                android:background="@drawable/statusbar"-->
-                <!--                app:drawableLeftCompat="@mipmap/left"
-                                    app:drawableRightCompat="@mipmap/right"-->
+
                 <TextView
                     android:id="@+id/fastestTimeTextView2"
                     android:layout_width="180dp"
@@ -108,8 +98,7 @@
                     android:text="FASTEST"
                     android:textOff="TASK 2 START"
                     android:textOn="STOP" />
-                <!--                android:drawableEnd="@mipmap/qqqq"
-                                    android:background="@drawable/border_black_state"-->
+
                 <ImageButton
                     android:id="@+id/fastestResetImageBtn2"
                     style="@style/Widget.AppCompat.ImageButton"
@@ -118,7 +107,7 @@
                     android:layout_marginStart="65dp"
                     android:layout_marginTop="30dp"
                     android:background="@color/transparent"/>
-                <!--                app:srcCompat="@drawable/ic_refresh"-->
+
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -99,11 +99,6 @@
                         android:background="@drawable/reset_btn"
                         />
                 </LinearLayout>
-
-
-
-
-                <!--                android:drawableLeft="@mipmap/two_head_dragon"-->
             </LinearLayout>
         </LinearLayout>
 
@@ -163,25 +158,6 @@
 
                 </LinearLayout>
             </LinearLayout>
-<!--            "Preload Defaults"-->
-<!--            <Button-->
-<!--                android:id="@+id/updateMapBtn"-->
-<!--                android:layout_width="match_parent"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginTop="13dp"-->
-<!--                android:paddingEnd="10dp"-->
-<!--                android:text="DO NOT CLICK"-->
-<!--                android:background="@drawable/border_black_state"-->
-<!--                app:backgroundTint="@color/colorYellow"/>-->
-
-            <ImageView
-                android:id="@+id/eBtn"
-                android:layout_gravity="center"
-                android:layout_width="0dp"
-                android:layout_height="00dp"
-                android:layout_marginTop="20dp"
-                android:src="@drawable/snor_0"/>
-
         </LinearLayout>
     </LinearLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,4 +1,4 @@
-package com.example.mdp_group_14.ui.theme
+package com.example.mdp_group_11.ui.theme
 
 import android.app.Activity
 import android.os.Build
@@ -26,19 +26,10 @@ private val LightColorScheme = lightColorScheme(
     secondary = PurpleGrey40,
     tertiary = Pink40
 
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
 )
 
 @Composable
-fun Mdp_group_14Theme(
+fun Mdp_group_11_theme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
