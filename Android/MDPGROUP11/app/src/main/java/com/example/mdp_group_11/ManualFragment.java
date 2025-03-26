@@ -1,4 +1,4 @@
-package com.example.mdp_group_14;
+package com.example.mdp_group_11;
 
 import android.content.Context;
 import android.content.DialogInterface;
@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
@@ -20,10 +19,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-// NOTE: THIS HAS BEEN REMOVED - NOT IN USE IN FINAL APP
-// This was made for redundancy - in case an obstacle can't be placed properly, this is a slightly faster way to get the right syntax to manually send to RPi
-public class EmergencyFragment extends DialogFragment {
-    private static final String TAG = "EmergencyFragment";
+public class ManualFragment extends DialogFragment {
+    private static final String TAG = "ManualFragment";
     View rootView;
     private SharedPreferences.Editor editor;
     Button addManualBtn, cancelBtn;
@@ -81,9 +78,7 @@ public class EmergencyFragment extends DialogFragment {
             @Override
             public void onClick(View view) {
                 showLog("Clicked addManualBtn");
-//                EditText chatInput = BluetoothCommunications.getTypeBoxEditText();
-//                String old = chatInput.getText().toString();
-//                if(old.equals("")) old = "ALG";
+
                 String obstDir="NULL";
                 int col = Integer.parseInt(xValSpinner.getSelectedItem().toString());
                 int row = Integer.parseInt(yValSpinner.getSelectedItem().toString());
@@ -92,21 +87,6 @@ public class EmergencyFragment extends DialogFragment {
                 String dir = dirValSpinner.getSelectedItem().toString();
 
                 switch(dir) {
-//                    case "North":
-//                        obstDir = 90;
-//                        break;
-//                    case "South":
-//                        obstDir = -90;
-//                        break;
-//                    case "East":
-//                        obstDir = 0;
-//                        break;
-//                    case "West":
-//                        obstDir = 180;
-//                        break;
-//                    default:
-//                        showLog("Setting default direction: North");
-//                        obstDir = 90;
                     case "West":
                         obstDir="left";
                         break;
@@ -120,7 +100,6 @@ public class EmergencyFragment extends DialogFragment {
                         obstDir="up";
                         break;
                 }
-//                showLog("Dir = " + dir + "; algDir = " + obstDir);
 
                 if (isObstacle)
                 {
@@ -129,9 +108,6 @@ public class EmergencyFragment extends DialogFragment {
                 }
 
                 else{
-//                    gridMap.setRobotDirection("up");
-//                    gridMap.updateRobotAxis(col, row, "up");
-//                    BluetoothCommunications.getMessageReceivedTextView().append(Integer.toString(col)+Integer.toString(row)+obstDir);
                     gridMap.canDrawRobot = true;
                     gridMap.setStartCoordStatus(true);
                     gridMap.setStartCoord(col+1,row+1);
@@ -140,17 +116,6 @@ public class EmergencyFragment extends DialogFragment {
 
                 }
 
-                // obstID is acquired based on the obstID set for the PREVIOUS obstacle (prev obst MUST be added in this way)
-//                int obstID = 0;
-//                if(!old.equals("ALG")) {
-//                    obstID = Integer.parseInt(old.substring(old.lastIndexOf(",") + 1)) + 1;
-//                }
-//                if(!isObstacle) obstID = -1;
-//
-//                String obstString = "|" + (col * 10 + 5) + "," + (row * 10 + 5) + "," + obstDir + "," + obstID;
-//                String newString = old + obstString;
-//                chatInput.setText(newString);
-//                getDialog().dismiss();
                 gridMap.invalidate();
                 showToast("Obstacle string addedd!");
                 showLog("Exiting addManualBtn");

@@ -1,4 +1,4 @@
-package com.example.mdp_group_14;
+package com.example.mdp_group_11;
 
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
@@ -21,20 +21,19 @@ import java.util.UUID;
 
 public class BluetoothConnectionService {
     private static final String TAG = "Debugging Tag";
-    private static final String appName = "MDP_Grp_14";
+    private static final String appName = "MDP_Grp_11";
     private static final UUID MY_UUID = UUID.fromString("5BAD6310-FF24-11EF-AC77-0800200C9A66");
 
     private final BluetoothAdapter mBluetoothAdapter;
     Context mContext;
 
-    private AcceptThread mInsecureAcceptThread;
+    private AcceptThread mAcceptThread;
 
     private ConnectThread mConnectThread;
     private BluetoothDevice mmDevice;
     private UUID deviceUUID;
     ProgressDialog mProgressDialog;
     Intent connectionStatus;
-//
     public static boolean BluetoothConnectionStatus=false;
     private static ConnectedThread mConnectedThread;
 
@@ -105,7 +104,6 @@ public class BluetoothConnectionService {
                 Log.e(TAG, "ConnectThread: Could not create InsecureRfcommSocket " + e.getMessage());
             }
             mmSocket = tmp;
-            //mBluetoothAdapter.cancelDiscovery();
 
             try {
                 mmSocket.connect();
@@ -123,16 +121,6 @@ public class BluetoothConnectionService {
                 }
                 Log.d(TAG, "RUN: ConnectThread: could not connect to UUID." + MY_UUID);
                 try {
-
-
-
-//                        BluetoothSetUp mBluetoothPopUpActivity = new Intent("");
-//                        mBluetoothPopUpActivity.runOnUiThread(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                Toast.makeText(mContext, "Failed to connect to the Device.", Toast.LENGTH_LONG).show();
-//                            }
-//                        });
 
                 } catch (Exception z) {
                     z.printStackTrace();
@@ -167,9 +155,9 @@ public class BluetoothConnectionService {
         }
 
         //If accept thread is null we want to start a new one
-        if(mInsecureAcceptThread == null){
-            mInsecureAcceptThread = new AcceptThread();
-            mInsecureAcceptThread.start();
+        if(mAcceptThread == null){
+            mAcceptThread = new AcceptThread();
+            mAcceptThread.start();
         }
     }
 
@@ -219,7 +207,7 @@ public class BluetoothConnectionService {
             inStream = tmpIn;
             outStream = tmpOut;
         }
-        // Logic is a bit wonky - good to fix if possible (sometimes messages are sent 1 char at a time)
+
         public void run() {
             byte[] buffer = new byte[1024];
             int bytes;
@@ -259,24 +247,14 @@ public class BluetoothConnectionService {
                 Log.e(TAG, "Error writing to output stream. "+e.getMessage());
             }
         }
-
-
-        public void cancel(){
-            Log.d(TAG, "cancel: Closing Client Socket");
-            try{
-                mSocket.close();
-            } catch(IOException e){
-                Log.e(TAG, "cancel: Failed to close ConnectThread mSocket " + e.getMessage());
-            }
-        }
     }
 
     private void connected(BluetoothSocket mSocket, BluetoothDevice device) {
         Log.d(TAG, "connected: Starting.");
         mmDevice =  device;
-        if (mInsecureAcceptThread != null) {
-            mInsecureAcceptThread.cancel();
-            mInsecureAcceptThread = null;
+        if (mAcceptThread != null) {
+            mAcceptThread.cancel();
+            mAcceptThread = null;
         }
 
         mConnectedThread = new ConnectedThread(mSocket);

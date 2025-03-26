@@ -1,7 +1,6 @@
-package com.example.mdp_group_14;
+package com.example.mdp_group_11;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -16,7 +15,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -24,29 +22,17 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
 import com.google.android.material.tabs.TabLayout;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Objects;
 import java.util.UUID;
 
 public class Home extends Fragment {
-
-    final Handler handler = new Handler();
-    // Declaration Variables
 
     private static SharedPreferences sharedPreferences;
     private static SharedPreferences.Editor editor;
@@ -61,14 +47,11 @@ public class Home extends Fragment {
     BluetoothDevice mBTDevice;
     private static UUID myUUID;
     ProgressDialog myDialog;
-    Bitmap bm, mapscalable;
     String obstacleID;
 
     private static final String TAG = "Main Activity";
     public static boolean stopTimerFlag = false;
     public static boolean stopWk9TimerFlag = false;
-
-    public static boolean trackRobot = true;
 
     private int g_coordX;
     private int g_coordY;
@@ -87,8 +70,6 @@ public class Home extends Fragment {
         sharedPreferences = getActivity().getSharedPreferences("Shared Preferences",
                 Context.MODE_PRIVATE);
 
-
-
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getActivity().getSupportFragmentManager(),
                 FragmentPagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT);
 
@@ -103,8 +84,6 @@ public class Home extends Fragment {
 
         TabLayout tabs = root.findViewById(R.id.tabs);
         tabs.setupWithViewPager(viewPager);
-
-
 
         LocalBroadcastManager
                 .getInstance(getContext())
@@ -172,7 +151,6 @@ public class Home extends Fragment {
                 }
         );
         PathTranslator pathTranslator = new PathTranslator(gridMap);
-//        pathTranslator.translatePath("MOVE,FORWARD,30");
         return root;
     }
 
@@ -192,9 +170,6 @@ public class Home extends Fragment {
 
     public static TextView getBluetoothStatus() { return bluetoothStatus; }
     public static TextView getConnectedDevice() { return bluetoothDevice; }
-    // For week 8 only
-    public static boolean getTrackRobot() { return trackRobot; }
-    public static void toggleTrackRobot() { trackRobot = !trackRobot; }
 
     public static void sharedPreferences() {
         sharedPreferences = Home.getSharedPreferences(Home.context);
@@ -203,24 +178,6 @@ public class Home extends Fragment {
 
     private static SharedPreferences getSharedPreferences(Context context) {
         return context.getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
-    }
-
-    // Send Coordinates to alg
-    public static void printCoords(String message){
-        showLog("Displaying Coords untranslated and translated");
-        showLog(message);
-        String[] strArr = message.split("_",2);
-
-        // Translated ver is sent
-        if (BluetoothConnectionService.BluetoothConnectionStatus == true){
-            byte[] bytes = strArr[1].getBytes(Charset.defaultCharset());
-            BluetoothConnectionService.write(bytes);
-        }
-
-        // Display both untranslated and translated coordinates on CHAT (for debugging)
-        refreshMessageReceivedNS("Untranslated Coordinates: " + strArr[0] + "\n");
-        refreshMessageReceivedNS("Translated Coordinates: "+strArr[1]);
-        showLog("Exiting printCoords");
     }
 
     // Send message to bluetooth (not shown on chat box)
@@ -236,40 +193,8 @@ public class Home extends Fragment {
         showLog("Exiting printMessage");
     }
 
-    // Send message to bluetooth (not shown on chat box)
-    public static void printMessage(JSONArray message) {
-        showLog("Entering printMessage");
-        editor = sharedPreferences.edit();
-
-    }
-
-
-//        if (BluetoothConnectionService.BluetoothConnectionStatus) {
-////            JSONObject jsonObj = message.getJSONObject("data");
-//        JSONObject js=new JSONObject();
-//        try {
-//            JSONArray ja=new JSONArray();
-//            js.put("key", "floor");
-//            ja.put(js);
-//            BluetoothConnectionService.write(ja);
-//
-//        }
-//        catch (JSONException e) {
-//            showLog("lol!");
-//
-//
-//            //BluetoothConnectionService.write({"key":"test","value":"hello"});
-//        }
-//        //showLog(message);
-//        showLog("Exiting printMessage");
-//    }
-
     // Purely to display a message on the chat box - NOT SENT via BT
     public static void refreshMessageReceivedNS(String message){
-        BluetoothCommunications.getMessageReceivedTextView().append(message+ "\n");
-    }
-
-    public static void refreshMessageReceivedNS(int message){
         BluetoothCommunications.getMessageReceivedTextView().append(message+ "\n");
     }
 
@@ -279,22 +204,16 @@ public class Home extends Fragment {
         int y = gridMap.getCurCoord()[1];
         String dir;
         String newDir = gridMap.getRobotDirection();
-//        newDir = newDir.toUpperCase();
         directionAxisTextView.setText(sharedPreferences.getString("direction","")); //changes the UI direction display as well
-        //printMessage("Direction is set to " + direction); //OLD VER
 
         dir= (newDir.equals("up"))?"NORTH":(newDir.equals("down"))?"SOUTH":(newDir.equals("left"))?"WEST":"EAST";
         if ((x - 2)>=0 && (y - 1)>=0)
         {
-//          BluetoothCommunications.getMessageReceivedTextView().append("ROBOT" + "," + (col - 2)*5 + "," + (row - 1)*5 + "," + dir.toUpperCase());
             Home.printMessage("ROBOT" + "," + (x-2)*5 + "," + (y-1)*5 + "," + dir.toUpperCase());
         }
         else{
             showLog("out of grid");
         }
-//        printMessage("ROBOT,"+ x + "," + y + "," + dir);
-//        BluetoothCommunications.getMessageReceivedTextView().append("ROBOT,"+ (x-1) +"," + (y-1) + "," + dir+"\n"); //for troubleshooting
-
     }
 
     public static void refreshLabel() {
@@ -352,14 +271,6 @@ public class Home extends Fragment {
 
             String[] cmdd = message.split(",");
 
-//            if (message.contains(" "))
-//            {
-//                message= Arrays.toString(message.split(" "));
-//            }
-//            showLog("cmd1 --- " + cmdd[1]);
-//            showLog("cmd2 --- " + cmdd[2]);
-
-
             int[] global_store = gridMap.getCurCoord();
             g_coordX = global_store[0];
             g_coordY = global_store[1];
@@ -369,12 +280,12 @@ public class Home extends Fragment {
             if (message.contains("STATUS")) {
                 robotStatusTextView.setText(message.split(":")[1]);
             }
+
             //ROBOT|5,4,EAST (Early version of updating robot position via comms)
             if(message.contains("ROBOT")) {
                 String[] cmd = message.split("\\|");
                 String[] sentCoords = cmd[1].split(",");
                 String[] sentDirection = sentCoords[2].split("\\.");
-//                BluetoothCommunications.getMessageReceivedTextView().append("\n");
                 String direction = "";
                 String abc = String.join("", sentDirection);
                 if (abc.contains("EAST")) {
@@ -394,6 +305,7 @@ public class Home extends Fragment {
                 }
                 gridMap.setCurCoord(Integer.valueOf(sentCoords[1]) + 2, 19 - Integer.valueOf(sentCoords[0]), direction);
             }
+
             //image format from RPI is "TARGET~<obID>~<ImValue>" eg TARGET~3~7
             else if(message.contains("TARGET")) {
                 try {
@@ -431,24 +343,11 @@ public class Home extends Fragment {
             }
             else if(message.contains("ARROW")){
                 String[] cmd = message.split(",");
-//                BluetoothCommunications.getMessageReceivedTextView().append("Obstacle no: " + cmd[1]+ "TARGET ID: " + cmd[2] + "\n");
 
                 Home.refreshMessageReceivedNS("TASK2"+"\n");
                 Home.refreshMessageReceivedNS("obstacle id: "+cmd[1]+", ARROW: "+cmd[2]);
 
-
-//                updateStatus(cmd[0]+" "+ cmd[1]+" "+cmd[2]);
             }
-            // OLD VER: Expects a syntax of e.g. Algo|f010. Commented out and implemented new version below
-/*            if(message.contains("Algo")) {
-                // translate the message after Algo|
-                if(trackRobot)
-                    pathTranslator.translatePath(message.split("\\|")[1]);
-//                pathTranslator.altTranslation(message.split("\\|")[1]);   // last min addition - untested
-            }*/
-
-            //NEW VER: Expects a syntax of eg. MOVE,<DISTANCE IN CM>,<DIRECTION>.
-            //NEW VER: Expects a syntax of eg. TURN,<DIRECTION>.
 
             //CASE 1 & 2: MoveInstruction or TurnInstruction sent
             else if(message.contains("MOVE") || message.contains("TURN")){
@@ -458,7 +357,6 @@ public class Home extends Fragment {
             else if(message.contains("STOP"))
             {
                 Home.refreshMessageReceivedNS("STOP received");
-//                showLog("received Stop");
                 Home.stopTimerFlag = true;
                 Home.stopWk9TimerFlag=true;
                 timerHandler.removeCallbacks(ControlFragment.timerRunnableExplore);

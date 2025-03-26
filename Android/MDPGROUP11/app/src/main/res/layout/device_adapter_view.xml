@@ -12,7 +12,6 @@
         android:textColor="@android:color/black"
         android:gravity="center"
         android:textSize="20sp" />
-    <!--        android:fontFamily="@font/open_sans_semibold"-->
 
     <TextView
         android:id="@+id/deviceAddress"

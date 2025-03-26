@@ -13,6 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "mdp_group_14"
+rootProject.name = "mdp_group_11"
 include(":app")
  

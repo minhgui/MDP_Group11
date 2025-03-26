@@ -1,4 +1,4 @@
-package com.example.mdp_group_14;
+package com.example.mdp_group_11;
 
 import android.Manifest;
 import android.app.ProgressDialog;
@@ -49,8 +49,8 @@ public class BluetoothSetUp extends Fragment {
     public DeviceListAdapter mNewDeviceListAdapter;
     public DeviceListAdapter mPairedDeviceListAdapter;
     public static TextView connStatusTextView;
-    ListView lvNewDevices;  // otherDevicesListView
-    ListView lvPairedDevices;   // pairedDevicesListView
+    ListView lvNewDevices;  //otherDevicesListView
+    ListView lvPairedDevices;   //pairedDevicesListView
     Button connectBtn;
     Button btnSearch;
     ProgressDialog myDialog;
@@ -81,12 +81,7 @@ public class BluetoothSetUp extends Fragment {
 
     boolean retryConnection = false;
     Handler reconnectionHandler = new Handler();
-    Context mContext;
-//    public BluetoothSetUp(Context context) {
-//
-//        this.mContext = context;
-//
-//    }
+
     Runnable reconnectionRunnable = new Runnable() {
         @Override
         public void run() {
@@ -135,9 +130,6 @@ public class BluetoothSetUp extends Fragment {
         connectBtn = root.findViewById(R.id.connectBtn);
         btnSearch = root.findViewById(R.id.scanButton);
 
-        int width = dm.widthPixels;
-        int height = dm.heightPixels;
-
         // Get bluetooth adapter
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -152,8 +144,6 @@ public class BluetoothSetUp extends Fragment {
 
         IntentFilter filter2 = new IntentFilter("ConnectionStatus");
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver5, filter2);
-
-//        checkBTPermissions(); // might help with the 1st time crashing when clicking 'Scan'
 
         lvNewDevices.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -290,38 +280,10 @@ public class BluetoothSetUp extends Fragment {
             }
         });
 
-
-
-
-
-
-
-
-
         return root;
     }
 
-//
-//    private void checkBTPermissions() {
-//        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP){
-//            int permissionCheck = 0;
-//            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-//                permissionCheck = this.checkSelfPermission("Manifest.permission.ACCESS_FINE_LOCATION");
-//            }
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                permissionCheck += this.checkSelfPermission("Manifest.permission.ACCESS_COARSE_LOCATION");
-//            }
-//            if (permissionCheck != 0) {
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-//                    this.requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1001);
-//                }
-//            }
-//        } else {
-//            Log.d(TAG, "checkBTPermissions: No need to check permissions. SDK version < LOLLIPOP.");
-//        }
-//    }
-
-                             private void checkBTPermissions(){
+    private void checkBTPermissions(){
         int permission1 = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_EXTERNAL_STORAGE);
         int permission2 = ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.BLUETOOTH_SCAN);
         if (permission1 != PackageManager.PERMISSION_GRANTED) {
@@ -463,7 +425,6 @@ public class BluetoothSetUp extends Fragment {
                 if(mDevice.getBondState() == BluetoothDevice.BOND_BONDED){
                     Log.d(TAG, "BOND_BONDED.");
                     updateStatus("Successfully paired with " + mDevice.getName());
-                    //mBTDevice = mDevice;
                     Scanning();
                 }
                 if(mDevice.getBondState() == BluetoothDevice.BOND_BONDING){
@@ -502,8 +463,6 @@ public class BluetoothSetUp extends Fragment {
                 Log.d(TAG, "mBroadcastReceiver5: Disconnected from "+mDevice.getName());
                 updateStatus("Disconnected from "+mDevice.getName());
                 mBluetoothConnection = new BluetoothConnectionService(getContext());
-                //mBluetoothConnection.startAcceptThread();
-
 
                 sharedPreferences = getActivity().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
                 editor = sharedPreferences.edit();
