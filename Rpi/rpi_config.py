@@ -15,9 +15,9 @@ BT_BUFFER_SIZE = 2048
 
 # STM Interface
 STM_BAUDRATE = 115200
-STM_ACK_MSG = "ACK"
+STM_ACK_MSG = "A"
 STM_NAV_COMMAND_FORMAT = '^[FB][[SLR][0-9]{3}$' # task 1
 STM_NAV_COMMAND_FORMAT = '^OBS[1-2][ULR]$' # task 2
 STM_GYRO_RESET_COMMAND = "RESET"
-STM_GYRO_RESET_DELAY = 5 # time to wait for gyro reset
+STM_GYRO_RESET_DELAY = 5 # wait for gyro reset
 

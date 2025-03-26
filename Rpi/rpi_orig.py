@@ -5,8 +5,7 @@ from stm import STMInterface
 from rpi_config import STM_GYRO_RESET_COMMAND
 import Camera
 
-# Set mode for task1 or task2
-TASK_2 = False #TODO: Change this to False for task 1, True for task 2.
+TASK_2 = False #False for task 1, True for task 2.
 
 # Total Integration
 class RPiMain:
@@ -29,31 +28,25 @@ class RPiMain:
         self.STM.disconnect()
 
     def run(self):
-        print("[RPiMain] Starting RPiMain...")
-
-        # Connect components
+        print("[RPiMain] Starting RPiMain")
         self.connect_components()
         print("[RPiMain] Components connected successfully")
 
-        # Create threads for sending messages
+        # Send messages threads
         Android_send = Thread(target=self.Android.send, name="Android_send_thread")
         PC_send = Thread(target=self.PC.send, name="PC_send_thread")
         STM_send = Thread(target=self.STM.send, name="STM_send_thread")
 
-        # Create threads for receiving messages
+        # Receive messages threads
         Android_listen = Thread(target=self.Android.listen, name="Android_listen_thread")
         PC_listen = Thread(target=self.PC.listen, name="PC_listen_thread")
 
-        # Sending threads
         Android_send.start()
         PC_send.start()
         STM_send.start()
-        print("[RPiMain] Sending threads started successfully")
-
-        # Listening threads
         Android_listen.start()
         PC_listen.start()
-        print("[RPiMain] Listening threads started successfully")
+        print("[RPiMain] Threads started successfully")
         
         # Test commands
         #self.STM.send2()
@@ -68,7 +61,6 @@ class RPiMain:
 
         # Cleanup after threads finish
         self.cleanup()
-
         print("[RPiMain] Exiting")
 
 if __name__ == "__main__":

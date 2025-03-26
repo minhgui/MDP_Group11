@@ -38,7 +38,7 @@ class AndroidInterface:
             bt.advertise_service(self.socket, "Group11-Server", service_id=self.uuid, service_classes=[self.uuid, bt.SERIAL_PORT_CLASS], profiles=[bt.SERIAL_PORT_PROFILE])
 
         except socket.error as e:
-            print("[Android] ERROR: Android socket binding failed -", str(e))
+            print("[Android] Android socket binding failed -", str(e))
             sys.exit()
             
         print("[Android] Waiting for Android connection...")
@@ -51,15 +51,14 @@ class AndroidInterface:
             print("[Android] ERROR: connection failed -", str(e))
 
     def disconnect(self):
-        # Close the Bluetooth socket
+        # Close Bluetooth socket
         try:
             self.socket.close()
             print("[Android] Disconnected from Android successfully.")
         except Exception as e:
-            print("[Android] ERROR: Failed to disconnect from Android -", str(e))
+            print("[Android] Failed to disconnect from Android -", str(e))
             
     def reconnect(self):
-        # Disconnect and then connect again
         self.disconnect()
         self.connect()
 
@@ -123,7 +122,7 @@ class AndroidInterface:
                     print("Unknown message: ", decodedMsg)
 
             except (socket.error, IOError, Exception, ConnectionResetError) as e:
-                print("[Android] ERROR:", str(e))
+                print("[Android] Error:", str(e))
     
     # Utility for Android checklist
     def send2(self):
@@ -150,15 +149,16 @@ class AndroidInterface:
             elif message_type == "NAVIGATION":
                 message = message_str
             else:
-                message = "Incorrect message type received" # Error handling due to many json object types
+                message = "Unknown message type received" # Error handling due to many json object types
 
             exception = True
             while exception: 
                 try:
-                    self.client_socket.sendall(message)
-                    print("[Android] Write to Android: " + message[:MSG_LOG_MAX_SIZE])
+                    if message != "Incorrect message type received":
+                        self.client_socket.sendall(message)
+                        print("[Android] Write to Android: " + message[:MSG_LOG_MAX_SIZE])
                 except Exception as e:
-                    print("[Android] ERROR: Failed to write to Android -", str(e))
+                    print("[Android] Failed to write to Android -", str(e))
                     self.reconnect()  # reconnect and resend
                 else:
                     exception = False  # done sending, get next message

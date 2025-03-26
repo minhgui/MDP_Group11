@@ -25,7 +25,6 @@ class PCInterface:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) 
-                print("[PC] Socket established successfully.")
                 sock.bind((self.host, self.port))
                 sock.listen(128)
                 print("[PC] Waiting for PC connection...")
@@ -72,7 +71,7 @@ class PCInterface:
                         self.reconnect()
 
                     decoded_msg = message.decode("utf-8")
-                    if len(decoded_msg) <= 1:
+                    if len(decoded_msg) < 1:
                         continue
 
                     print("[PC] Read from PC:", decoded_msg[:MSG_LOG_MAX_SIZE])
@@ -152,7 +151,6 @@ class PCInterface:
     def prepend_msg_size(self, message):
         message_bytes = message.encode("utf-8")
         message_len = len(message_bytes)
-        
         length_bytes = message_len.to_bytes(4, byteorder="big")
         return length_bytes + message_bytes
     

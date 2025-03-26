@@ -67,8 +67,8 @@ class STMInterface:
         for command in commands:
             print("[RPI] Writing to STM:", command)
             self.write_to_stm(command)
-        capture_and_send_image_thread = threading.Thread(target=self.send_image_to_pc(final_image=True), daemon=True)   
-        capture_and_send_image_thread.start()
+        image_thread = threading.Thread(target=self.RPiMain.PC.msg_queue.put(get_image(final_image=True)) , daemon=True)   
+        image_thread.start()
             
     def send(self):
         # Send commands to STM 
@@ -99,8 +99,8 @@ class STMInterface:
                         self.write_to_stm(command)
                     
                     # Start a new thread to capture and send the image to PC
-                    capture_and_send_image_thread = threading.Thread(target=self.send_image_to_pc(final_image=True), daemon=True)
-                    capture_and_send_image_thread.start()
+                    image_thread = threading.Thread(target=self.RPiMain.PC.msg_queue.put(get_image(final_image=True)) , daemon=True)
+                    image_thread.start()
                     
             else:
                 print("[STM] Rejecting message with unknown type [%s] for STM" % message_type)
@@ -130,14 +130,11 @@ class STMInterface:
                     self.wait_for_ack()
 
     def wait_for_ack(self):
-        # Waiting for ACK from STM
+        # Waiting for ACK
         message = self.listen()
         if message  == STM_ACK_MSG:
             print("[STM] Received ACK from STM") 
         else:
             print("[STM] ERROR: Unexpected message from STM -", message)
-            self.reconnect() 
-
-    def send_image_to_pc(self, final_image:bool):
-        self.RPiMain.PC.msg_queue.put(get_image(final_image=final_image))      
+            self.reconnect()      
 
