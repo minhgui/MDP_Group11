@@ -29,13 +29,6 @@ class Node():
         self.h = 0
         self.f = 0
 
-    def discretize_position(self, x, y, theta, thetaBins=24):
-        x_g = int(x // (200/c.GRID_SIZE))
-        y_g = int(y // (200/c.GRID_SIZE))
-        theta_g = int(((theta * 180 / np.pi + 180)//(360/thetaBins)))
-
-        return x_g, y_g, theta_g
-
     def __eq__(self, other):
 
         return abs(self.x - other.x) <= 3.5 and abs(self.y - other.y) <= 3.5 and \
@@ -43,12 +36,16 @@ class Node():
     
     def __lt__(self, other):
         return self.f < other.f
+        
+    def discretize_position(self, x, y, theta, thetaBins=24):
+        x_g = int(x // (200/c.GRID_SIZE))
+        y_g = int(y // (200/c.GRID_SIZE))
+        theta_g = int(((theta * 180 / np.pi + 180)//(360/thetaBins)))
+
+        return x_g, y_g, theta_g
 
 class HybridAStar():
-    def __init__(self, map: OccupancyMap, x_0: float=15, y_0: float=10, theta_0: float=np.pi/2, 
-                 x_f: float=15, y_f: float=180, theta_f: float=np.pi/2, theta_offset: float=0, steeringChangeCost=10, gearChangeCost=20,
-                    L: float=5, minR: float=25, heuristic: str='hybriddiag', simulate: bool=False, thetaBins=24):
-        """HybridAStar constructor
+    """HybridAStar constructor
 
         Args:
             map (2D numpy array): binary occupancy map
@@ -63,7 +60,11 @@ class HybridAStar():
             gearChangeCost (int, optional): extra cost for changing gear input. Defaults to 20.
             L (float, optional): distance travel each step in cm. Defaults to 5.
             minR (float, optional): minimum turning radius in cm. Defaults to 25.
-        """
+    """
+    def __init__(self, map: OccupancyMap, x_0: float=15, y_0: float=10, theta_0: float=np.pi/2, 
+                 x_f: float=15, y_f: float=180, theta_f: float=np.pi/2, theta_offset: float=0, steeringChangeCost=10, gearChangeCost=20,
+                    L: float=5, minR: float=25, heuristic: str='hybriddiag', simulate: bool=False, thetaBins=24):
+
         
         assert -np.pi <= theta_0, theta_f <= np.pi
         assert -10 <= x_0, y_0 <= 210 # we changed this on 22/2/24
@@ -210,6 +211,30 @@ class HybridAStar():
         else:
             return path, None
 
+    def calculate_next_node(self, currentNode, choice):
+        gear = choice[0]
+        steering = choice[1]
+
+        if steering == Steering.STRAIGHT:
+            x_b = currentNode.x + gear * self.L * math.cos(currentNode.theta)
+            y_b = currentNode.y + gear * self.L * math.sin(currentNode.theta)
+            theta_b = currentNode.theta
+
+        else:
+            x_c = currentNode.x + steering*self.minR*math.sin(currentNode.theta)
+            y_c = currentNode.y - steering*self.minR*math.cos(currentNode.theta)
+
+            theta_t = -steering*self.L/self.minR
+            theta_b = utils.normalise_theta(currentNode.theta + gear*theta_t)
+
+            x_ca = currentNode.x - x_c
+            y_ca = currentNode.y - y_c
+
+            x_b = x_c + (x_ca * math.cos(gear*theta_t) - y_ca * math.sin(gear*theta_t))
+            y_b = y_c + (x_ca * math.sin(gear*theta_t) + y_ca * math.cos(gear*theta_t))
+
+        return x_b, y_b, theta_b
+
     def checkPathFound(self, curNode, thetaMargin:float=np.pi/12, targetDistance:float=21, distanceMargin: float=7.5, maxPerpDistance:float=0.5):
         if abs(curNode.theta - self.theta_f) > thetaMargin:
             return False
@@ -241,34 +266,10 @@ class HybridAStar():
             return False
         
         return True
-
-    def calculate_next_node(self, currentNode, choice):
-        gear = choice[0]
-        steering = choice[1]
-
-        if steering == Steering.STRAIGHT:
-            x_b = currentNode.x + gear * self.L * math.cos(currentNode.theta)
-            y_b = currentNode.y + gear * self.L * math.sin(currentNode.theta)
-            theta_b = currentNode.theta
-
-        else:
-            x_c = currentNode.x + steering*self.minR*math.sin(currentNode.theta)
-            y_c = currentNode.y - steering*self.minR*math.cos(currentNode.theta)
-
-            theta_t = -steering*self.L/self.minR
-            theta_b = utils.normalise_theta(currentNode.theta + gear*theta_t)
-
-            x_ca = currentNode.x - x_c
-            y_ca = currentNode.y - y_c
-
-            x_b = x_c + (x_ca * math.cos(gear*theta_t) - y_ca * math.sin(gear*theta_t))
-            y_b = y_c + (x_ca * math.sin(gear*theta_t) + y_ca * math.cos(gear*theta_t))
-
-        return x_b, y_b, theta_b
         
 if __name__ == '__main__':
-    obstacles = [Obstacle(10, 10, 'N'), Obstacle(20, 10, 'S'), Obstacle(10, 20, 'E'), Obstacle(20, 20, 'W'), 
-                 Obstacle(38, 38, 'N')]
+    obstacles = [Obstacle(12, 15, 'S'), Obstacle(21, 15, 'N'), Obstacle(10, 30, 'E'), Obstacle(15, 35, 'W'), 
+                 Obstacle(40, 35, 'E')]
     map = OccupancyMap(obstacles)
 
     algo = HybridAStar(map, x_f=150, y_f=150, theta_f=np.pi, gearChangeCost=10, steeringChangeCost=10, 
@@ -277,22 +278,6 @@ if __name__ == '__main__':
     for node in path:
         print(f"Current Node (x:{node.x:.2f}, y: {node.y:.2f}, " +
                 f"theta: {node.theta*180/np.pi:.2f}), Action: {node.prevAction}")
-
-
-    '''
-    theta_grid = np.linspace(-np.pi, np.pi, 3600)
-    theta_g = (theta_grid * 180 / np.pi + (180 / 18)) // 18
-    
-    plt.plot(theta_grid, theta_g)
-    plt.show()
-    '''
-
-    '''
-    node = Node(5, 10, -np.pi/4, '')
-    x_b, y_b, theta_b = algo.calculate_next_node(node, (Gear.FORWARD, Steering.RIGHT))
-
-    print(x_b, y_b, theta_b*180/np.pi)
-    '''
 
 
     
