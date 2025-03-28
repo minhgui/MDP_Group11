@@ -8,8 +8,8 @@ import androidx.fragment.app.FragmentPagerAdapter;
 import java.util.ArrayList;
 
 public class SectionsPagerAdapter extends FragmentPagerAdapter {
-    private final ArrayList<Fragment> fragmentArrayList = new ArrayList<>();
-    private final ArrayList<String> fragmentTitle = new ArrayList<>();
+    private final ArrayList<Fragment> fragList = new ArrayList<>();
+    private final ArrayList<String> fragTitle = new ArrayList<>();
 
 
     public SectionsPagerAdapter(FragmentManager fm, int behaviour) {
@@ -18,22 +18,22 @@ public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return fragmentArrayList.get(position);
+        return fragList.get(position);
     }
 
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        return fragmentTitle.get(position);
+        return fragTitle.get(position);
     }
 
     @Override
     public int getCount() {
-        return fragmentArrayList.size();
+        return fragList.size();
     }
 
     public void addFragment(Fragment fm, String title){
-        fragmentArrayList.add(fm);
-        fragmentTitle.add(title);
+        fragList.add(fm);
+        fragTitle.add(title);
     }
 }

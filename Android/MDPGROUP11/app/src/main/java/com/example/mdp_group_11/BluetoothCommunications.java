@@ -24,7 +24,7 @@ import java.nio.charset.Charset;
 public class BluetoothCommunications extends Fragment {
     private static final String TAG = "BluetoothComms";
 
-    SharedPreferences sharedPreferences;
+    SharedPreferences sharedPrefs;
     private static TextView messageReceivedTextView;
     private static EditText typeBoxEditText;
     StringBuilder messages;
@@ -53,16 +53,15 @@ public class BluetoothCommunications extends Fragment {
         typeBoxEditText = root.findViewById(R.id.typeBoxEditText);
 
         // get shared preferences
-        sharedPreferences = getActivity().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
+        sharedPrefs = getActivity().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
 
         send.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked sendTextBtn");
                 String sentText = "" + typeBoxEditText.getText().toString();
 
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("message", sharedPreferences.getString("message", "") + '\n' + sentText);
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putString("message", sharedPrefs.getString("message", "") + '\n' + sentText);
                 editor.apply();
                 messageReceivedTextView.append(sentText+"\n");
                 typeBoxEditText.setText("");
@@ -71,15 +70,10 @@ public class BluetoothCommunications extends Fragment {
                     byte[] bytes = sentText.getBytes(Charset.defaultCharset());
                     BluetoothConnectionService.write(bytes);
                 }
-                showLog("Exiting sendTextBtn");
             }
         });
 
         return root;
-    }
-
-    private static void showLog(String message) {
-        Log.d(TAG, message);
     }
 
     public static TextView getMessageReceivedTextView() {

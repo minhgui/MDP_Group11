@@ -19,7 +19,6 @@ public class PathTranslator {
     }
 
     public void translatePath(String stmCommand) {
-        showLog("Entered translatePath");
         char commandType = 'z'; //commandType is a single character for switch case
         int commandValue = 0; //commandValue represents the value to move forwards or backwards.
 
@@ -33,7 +32,6 @@ public class PathTranslator {
 
             //set commandType for <DIRECTION>
             String direction = stmCommand.split(",")[1];
-            showLog("directions"+direction);
 
             commandValue = Integer.valueOf(stmCommand.split(",")[2].replace("\n",""));
 
@@ -126,7 +124,6 @@ public class PathTranslator {
             default:
                 showLog("Invalid commandType!");
         }
-        showLog("Exited translatePath");
     }
 
     private static void showLog(String message) {

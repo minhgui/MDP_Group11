@@ -9,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -27,7 +26,6 @@ public class MappingFragment extends Fragment {
     ImageButton directionChangeImageBtn, obstacleImageBtn;
     ToggleButton setStartPointToggleBtn;
     GridMap gridMap;
-
     Switch dragSwitch;
     Switch changeObstacleSwitch;
 
@@ -37,6 +35,7 @@ public class MappingFragment extends Fragment {
     static boolean changeObstacleStatus;
 
     String direction = "";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,8 +53,6 @@ public class MappingFragment extends Fragment {
         if (savedInstanceState != null)
             direction = savedInstanceState.getString("direction");
         gridMap = Home.getGridMap();
-        final DirectionsFragment directionFragment = new DirectionsFragment();
-        final ManualFragment manualFragment = new ManualFragment();
 
         resetMapBtn = root.findViewById(R.id.resetBtn);
         setStartPointToggleBtn = root.findViewById(R.id.startpointToggleBtn);
@@ -69,7 +66,6 @@ public class MappingFragment extends Fragment {
         resetMapBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked resetMapBtn");
                 showToast("Reseting map...");
                 Home.printMessage("CLEAR");
                 gridMap.resetMap();
@@ -106,7 +102,6 @@ public class MappingFragment extends Fragment {
         setStartPointToggleBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked setStartPointToggleBtn");
                 // 2nd consecutive tap on the toggle btn (logic to handle other buttons being tapped is in gridmap.toggleCheckedBtn())
                 if (setStartPointToggleBtn.getText().equals("SET START POINT")) {
                     showToast("Cancelled select starting point");
@@ -124,7 +119,6 @@ public class MappingFragment extends Fragment {
         saveMapObstacle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked saveMapObstacle");
                 String getObsPos = "";
                 mapPref = getContext().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
                 editor = mapPref.edit();
@@ -153,18 +147,12 @@ public class MappingFragment extends Fragment {
 
                 showToast("Saved map");
 
-                // Log message **after** saving the map
-                showLog("Saved robot at X: " + (robotPos != null ? robotPos[0] - 1 : "N/A") +
-                        ", Y: " + (robotPos != null ? robotPos[1] - 1 : "N/A") +
-                        ", Direction: " + robotDir);
-
             }
         });
 
         loadMapObstacle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked loadMapObstacle");
                 mapPref = getContext().getSharedPreferences("Shared Preferences", Context.MODE_PRIVATE);
                 String obsPos = mapPref.getString("maps","");
                 if(!obsPos.equals("")){
@@ -216,13 +204,9 @@ public class MappingFragment extends Fragment {
                                         savedDirection.equals("left") ? "WEST" : "EAST";
                         // Center center
                         Home.printMessage("ROBOT," + (savedX - 1) + "," + (savedY + 1) + "," + dir.toUpperCase() + "," + "Z");
-                        showLog("ROBOT," + (savedX -1 ) + "," + (savedY + 1) + "," + dir.toUpperCase() + "," + "Z");
-
-                        showLog("Loaded robot at X: " + (savedX - 1) + ", Y: " + (savedY + 1) + ", Direction: " + savedDirection);
                     }
 
                     gridMap.invalidate();
-                    showLog("Exiting Load Button");
                     showToast("Loaded saved map");
                 }
                 showToast("Empty saved map!");
@@ -233,7 +217,6 @@ public class MappingFragment extends Fragment {
         directionChangeImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked directionChangeImageBtn");
 
                 switch(direction)
                 {
@@ -254,10 +237,7 @@ public class MappingFragment extends Fragment {
                 editor.putString("direction",direction);
                 Home.refreshDirection(direction);
                 Toast.makeText(getActivity(), "Saving direction...", Toast.LENGTH_SHORT).show();
-                showLog("Exiting saveBtn");
                 editor.commit();
-
-                showLog("Exiting directionChangeImageBtn");
             }
         });
 
@@ -265,7 +245,6 @@ public class MappingFragment extends Fragment {
         obstacleImageBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked obstacleImageBtn");
 
                 if (!gridMap.getSetObstacleStatus()) {  // if setObstacleStatus is false
                     showToast("Please plot obstacles");
@@ -280,16 +259,11 @@ public class MappingFragment extends Fragment {
                 // disable the other on touch functions
                 changeObstacleSwitch.setChecked(false);
                 dragSwitch.setChecked(false);
-                showLog("obstacle status = " + gridMap.getSetObstacleStatus());
-                showLog("Exiting obstacleImageBtn");
+
             }
         });
 
         return root;
-    }
-
-    private void showLog(String message) {
-        Log.d(TAG, message);
     }
 
     private void showToast(String message) {

@@ -27,7 +27,6 @@ public class DirectionsFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        showLog("Entering onCreateView");
         rootView = inflater.inflate(R.layout.activity_directions, container, false);
         super.onCreate(savedInstanceState);
 
@@ -56,7 +55,6 @@ public class DirectionsFragment extends DialogFragment {
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked saveBtn");
                 String direction = spinner.getSelectedItem().toString();
                 editor.putString("direction",direction);
                 Home.refreshDirection(direction);
@@ -75,24 +73,19 @@ public class DirectionsFragment extends DialogFragment {
                 getDialog().dismiss();
             }
         });
-        showLog("Exiting onCreateView");
         return rootView;
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        showLog("Entering onSaveInstanceState");
         super.onSaveInstanceState(outState);
         saveBtn = rootView.findViewById(R.id.saveBtn);
-        showLog("Exiting onSaveInstanceState");
         outState.putString(TAG, direction);
     }
 
     @Override
     public void onDismiss(DialogInterface dialog) {
-        showLog("Entering onDismiss");
         super.onDismiss(dialog);
-        showLog("Exiting onDismiss");
     }
 
     private void showLog(String message) {

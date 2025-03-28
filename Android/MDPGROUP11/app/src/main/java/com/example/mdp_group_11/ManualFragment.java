@@ -31,7 +31,6 @@ public class ManualFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
-        showLog("Entering onCreateView");
         rootView = inflater.inflate(R.layout.activity_manual_input, container, false);
         super.onCreate(savedInstanceState);
 
@@ -77,12 +76,10 @@ public class ManualFragment extends DialogFragment {
         addManualBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked addManualBtn");
 
                 String obstDir="NULL";
                 int col = Integer.parseInt(xValSpinner.getSelectedItem().toString());
                 int row = Integer.parseInt(yValSpinner.getSelectedItem().toString());
-                showLog("Col = " + col  + ", Row = " + row);
                 // obstDir
                 String dir = dirValSpinner.getSelectedItem().toString();
 
@@ -118,16 +115,13 @@ public class ManualFragment extends DialogFragment {
 
                 gridMap.invalidate();
                 showToast("Obstacle string addedd!");
-                showLog("Exiting addManualBtn");
             }
         });
 
         cancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showLog("Clicked cancelDirectionBtn");
-                showLog("Exiting cancelDirectionBtn");
-                getDialog().dismiss();
+                 getDialog().dismiss();
             }
         });
 
@@ -136,20 +130,12 @@ public class ManualFragment extends DialogFragment {
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
-        showLog("Entering onSaveInstanceState");
         super.onSaveInstanceState(outState);
-        showLog("Exiting onSaveInstanceState");
     }
 
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
-        showLog("Entering onDismiss");
         super.onDismiss(dialog);
-        showLog("Exiting onDismiss");
-    }
-
-    private void showLog(String message) {
-        Log.d(TAG, message);
     }
 
     private void showToast(String message) { Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show(); }

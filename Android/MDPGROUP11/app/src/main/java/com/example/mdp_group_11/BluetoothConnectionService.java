@@ -21,8 +21,8 @@ import java.util.UUID;
 
 public class BluetoothConnectionService {
     private static final String TAG = "Debugging Tag";
-    private static final String appName = "MDP_Grp_11";
-    private static final UUID MY_UUID = UUID.fromString("5BAD6310-FF24-11EF-AC77-0800200C9A66");
+    private static final String appName = "MDP Group 11";
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private final BluetoothAdapter mBluetoothAdapter;
     Context mContext;
@@ -43,8 +43,7 @@ public class BluetoothConnectionService {
         startAcceptThread();
     }
 
-    //This thread will be running while listening for an incoming connection. Behaves like a
-    //server-side client. Runs until connection is accepted or cancelled.
+    //This thread will be running while listening for an incoming connection.
     private class AcceptThread extends Thread {
         private final BluetoothServerSocket ServerSocket;
 

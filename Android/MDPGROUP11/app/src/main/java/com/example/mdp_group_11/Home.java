@@ -34,7 +34,7 @@ import java.util.UUID;
 
 public class Home extends Fragment {
 
-    private static SharedPreferences sharedPreferences;
+    private static SharedPreferences sharedPrefs;
     private static SharedPreferences.Editor editor;
     private static Context context;
     public static Handler timerHandler = new Handler();
@@ -67,7 +67,7 @@ public class Home extends Fragment {
         View root = inflater.inflate(R.layout.home, container, false);
 
         // get shared preferences
-        sharedPreferences = getActivity().getSharedPreferences("Shared Preferences",
+        sharedPrefs = getActivity().getSharedPreferences("Shared Preferences",
                 Context.MODE_PRIVATE);
 
         SectionsPagerAdapter sectionsPagerAdapter = new SectionsPagerAdapter(getActivity().getSupportFragmentManager(),
@@ -172,8 +172,8 @@ public class Home extends Fragment {
     public static TextView getConnectedDevice() { return bluetoothDevice; }
 
     public static void sharedPreferences() {
-        sharedPreferences = Home.getSharedPreferences(Home.context);
-        editor = sharedPreferences.edit();
+        sharedPrefs = Home.getSharedPreferences(Home.context);
+        editor = sharedPrefs.edit();
     }
 
     private static SharedPreferences getSharedPreferences(Context context) {
@@ -182,16 +182,13 @@ public class Home extends Fragment {
 
     // Send message to bluetooth (not shown on chat box)
     public static void printMessage(String message) {
-        showLog("Entering printMessage");
-        editor = sharedPreferences.edit();
+        editor = sharedPrefs.edit();
 
         if (BluetoothConnectionService.BluetoothConnectionStatus) {
             byte[] bytes = message.getBytes(Charset.defaultCharset());
             BluetoothConnectionService.write(bytes);
         }
-        showLog(message);
-        showLog("Exiting printMessage");
-    }
+         }
 
     // Purely to display a message on the chat box - NOT SENT via BT
     public static void refreshMessageReceivedNS(String message){
@@ -204,7 +201,7 @@ public class Home extends Fragment {
         int y = gridMap.getCurCoord()[1];
         String dir;
         String newDir = gridMap.getRobotDirection();
-        directionAxisTextView.setText(sharedPreferences.getString("direction","")); //changes the UI direction display as well
+        directionAxisTextView.setText(sharedPrefs.getString("direction","")); //changes the UI direction display as well
 
         dir= (newDir.equals("up"))?"NORTH":(newDir.equals("down"))?"SOUTH":(newDir.equals("left"))?"WEST":"EAST";
         if ((x - 2)>=0 && (y - 1)>=0)
@@ -219,7 +216,7 @@ public class Home extends Fragment {
     public static void refreshLabel() {
         xAxisTextView.setText(String.valueOf(gridMap.getCurCoord()[0]-1));
         yAxisTextView.setText(String.valueOf(gridMap.getCurCoord()[1]-1));
-        directionAxisTextView.setText(sharedPreferences.getString("direction",""));
+        directionAxisTextView.setText(sharedPrefs.getString("direction",""));
     }
 
     private static void showLog(String message) {
@@ -267,7 +264,7 @@ public class Home extends Fragment {
         public void onReceive(Context context, Intent intent) {
             PathTranslator pathTranslator = new PathTranslator(gridMap);    // For real-time updating on displayed gridmap
             String message = intent.getStringExtra("receivedMessage");
-            showLog("receivedMessage: message --- " + message);
+           // showLog("receivedMessage: message --- " + message);
 
             String[] cmdd = message.split(",");
 
@@ -312,8 +309,8 @@ public class Home extends Fragment {
                     // Split at the first two commas to ensure cmd[2] contains the target ID
                     String[] cmd = message.split(",", 3);
 
-                    String obstacleNumber = cmd[1].trim();  // "5"
-                    String targetID = cmd[2].trim();  // Could be "20{..." or "3{..." or "99{..."
+                    String obstacleNumber = cmd[1].trim();
+                    String targetID = cmd[2].trim();
 
                     // Remove everything after '{' to keep only the target ID
                     if (targetID.contains("{")) {
@@ -328,7 +325,7 @@ public class Home extends Fragment {
 
                     String pathPart = message.split("\"path\":")[1];
                     pathPart = pathPart.replaceAll("[\\[\\]{}]", "");
-                    showLog("Extracted Full Path: " + pathPart);
+                   // showLog("Extracted Full Path: " + pathPart);
                     String[] coordinates = pathPart.split(",");
                     for (int i = 2; i < coordinates.length; i += 2) {
                         int x = Integer.parseInt(coordinates[i].trim());
@@ -431,11 +428,8 @@ public class Home extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        showLog("Entering onSaveInstanceState");
         super.onSaveInstanceState(outState);
-
         outState.putString(TAG, "onSaveInstanceState");
-        showLog("Exiting onSaveInstanceState");
     }
     private void updateStatus(String message) {
         Toast toast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
